@@ -28,3 +28,8 @@ assignees: ''
     **Contexte** : [Description de la situation]<br/>
     **Action** : [Ce que l'utilisateur fait]<br/>
     **Résultat attendu** : [Ce qui doit se passer]<br/>
+
+3. [ ] **Test validé**<br/>
+    **Contexte** : [Description de la situation]<br/>
+    **Action** : [Ce que l'utilisateur fait]<br/>
+    **Résultat attendu** : [Ce qui doit se passer]<br/>
