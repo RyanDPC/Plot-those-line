@@ -1,36 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Http;
 using System.Windows.Forms.DataVisualization.Charting;
-using ActionMarque.Interface.Api.Clients;
 
 namespace ActionMarque
 {
-    public partial class Form1 : Form
+    public partial class Form2 : Form
     {
         private readonly Chart chart = new Chart { Dock = DockStyle.Fill };
-        private readonly Button openForm2Button = new Button { Text = "Ouvrir Marketstack", Dock = DockStyle.Top, Height = 32 };
 
-        public Form1()
+        public Form2()
         {
             InitializeComponent();
 
             Controls.Add(chart);
-            Controls.Add(openForm2Button);
-
-            openForm2Button.Click += (_, __) =>
-            {
-                var f2 = new Form2();
-                f2.StartPosition = FormStartPosition.CenterParent;
-                f2.Show();
-            };
 
             var area = new ChartArea("main");
             area.AxisX.MajorGrid.Enabled = false;
@@ -61,21 +47,22 @@ namespace ActionMarque
 
             using (var http = new HttpClient())
             {
-                await LoadAlphaVantageAsync(http, symbols, colors);
-            }
-
-            SetFixedXAxisRange(chart, "main", 2019, 2025);
-        }
-
-        private async Task LoadAlphaVantageAsync(HttpClient http, string[] symbols, Color[] colors)
-        {
-            var api = new AlphaVantageClient(http);
-
-            for (int i = 0; i < symbols.Length; i++)
-            {
-                try
+                for (int i = 0; i < symbols.Length; i++)
                 {
-                    var data = await api.GetMonthlyCloseAsync(symbols[i], "9B4ZAIY8PY127RW3");
+                    var url = $"https://api.marketstack.com/v1/eod?access_key=006fe7d63a19548a4c9f4a6beaa755ba&symbols={Uri.EscapeDataString(symbols[i])}&date_from=2019-01-01&date_to=2025-12-31&limit=500";
+                    var json = await http.GetStringAsync(url);
+
+                    var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+                    var points = (obj["data"] ?? new Newtonsoft.Json.Linq.JArray())
+                        .Select(t => new
+                        {
+                            Date = (DateTime?)t["date"] ?? default(DateTime),
+                            Close = (double?)t["close"] ?? 0d
+                        })
+                        .Where(p => p.Date != default(DateTime))
+                        .OrderBy(p => p.Date)
+                        .ToList();
+
                     var series = chart.Series.FirstOrDefault(s => s.Name == symbols[i]);
                     if (series == null)
                     {
@@ -89,15 +76,12 @@ namespace ActionMarque
                         chart.Series.Add(series);
                     }
                     series.Points.Clear();
-                    foreach (var kv in data.OrderBy(d => d.Key))
-                        series.Points.AddXY(kv.Value, kv.Value);
-                }
-                catch (Exception ex)
-                {
-                    // Optional: show once
-                    if (!chart.Titles.Any()) chart.Titles.Add("AlphaVantage data unavailable");
+                    foreach (var p in points)
+                        series.Points.AddXY(p.Date, p.Close);
                 }
             }
+
+            SetFixedXAxisRange(chart, "main", 2019, 2025);
         }
 
         private void ApplyXAxisRange(Chart chart, string chartAreaName)
@@ -111,22 +95,8 @@ namespace ActionMarque
             var maxOa = allPoints.Max(p => p.XValue);
 
             var area = chart.ChartAreas[chartAreaName];
-            // Expand to whole years
             var minDt = new DateTime(DateTime.FromOADate(minOa).Year, 1, 1);
             var maxDt = new DateTime(DateTime.FromOADate(maxOa).Year, 12, 31);
-            area.AxisX.Minimum = minDt.ToOADate();
-            area.AxisX.Maximum = maxDt.ToOADate();
-            area.AxisX.IntervalType = DateTimeIntervalType.Years;
-            area.AxisX.Interval = 1;
-            area.AxisX.LabelStyle.Format = "yyyy";
-        }
-
-        private void ApplyDefaultXAxisRange(Chart chart, string chartAreaName)
-        {
-            var area = chart.ChartAreas[chartAreaName];
-            var now = DateTime.Now;
-            var minDt = new DateTime(now.Year - 1, 1, 1);
-            var maxDt = new DateTime(now.Year, 12, 31);
             area.AxisX.Minimum = minDt.ToOADate();
             area.AxisX.Maximum = maxDt.ToOADate();
             area.AxisX.IntervalType = DateTimeIntervalType.Years;
@@ -145,6 +115,7 @@ namespace ActionMarque
             area.AxisX.Interval = 1;
             area.AxisX.LabelStyle.Format = "yyyy";
         }
-
     }
 }
+
+
