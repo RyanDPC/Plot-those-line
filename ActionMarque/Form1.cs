@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Http;
 using System.Windows.Forms.DataVisualization.Charting;
 using ActionMarque.Interface.Api.Clients;
 
@@ -15,41 +11,22 @@ namespace ActionMarque
 {
     public partial class Form1 : Form
     {
-        private readonly Chart chart = new Chart { Dock = DockStyle.Fill };
-        private readonly Button openForm2Button = new Button { Text = "Ouvrir Marketstack", Dock = DockStyle.Top, Height = 32 };
+        private readonly Chart chart = new Chart() { Dock = DockStyle.Fill };
+        private readonly Button btnMarket = new Button() { Text = "Ouvrir Marketstack", Dock = DockStyle.Top, Height = 32 };
 
         public Form1()
         {
             InitializeComponent();
-
             Controls.Add(chart);
-            Controls.Add(openForm2Button);
+            Controls.Add(btnMarket);
 
-            openForm2Button.Click += (_, __) =>
-            {
-                var f2 = new Form2();
-                f2.StartPosition = FormStartPosition.CenterParent;
-                f2.Show();
-            };
+            btnMarket.Click += (_, __) => new Form2 { StartPosition = FormStartPosition.CenterParent }.Show();
 
-            var area = new ChartArea("main");
-            area.AxisX.MajorGrid.Enabled = false;
-            area.AxisX.IntervalType = DateTimeIntervalType.Years;
-            area.AxisX.Interval = 1;
-            area.AxisX.LabelStyle.Format = "yyyy";
-            area.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gainsboro;
-            area.AxisY.LabelStyle.Format = "#,0";
+            var area = new ChartArea("main") { AxisX = { MajorGrid = { Enabled = false }, IntervalType = DateTimeIntervalType.Years, Interval = 1, LabelStyle = { Format = "yyyy" } }, AxisY = { MajorGrid = { LineColor = Color.Gainsboro }, LabelStyle = { Format = "#,0" } } };
             chart.ChartAreas.Add(area);
 
-            if (!chart.Legends.Any())
-            {
-                var legend = new Legend
-                {
-                    Docking = Docking.Right,
-                    Alignment = StringAlignment.Near
-                };
-                chart.Legends.Add(legend);
-            }
+            chart.Legends.Add(new Legend { Docking = Docking.Right, Alignment = StringAlignment.Near });
+            chart.Titles.Add("AlphaVantage");
 
             Shown += async (_, __) => await LoadDataAsync();
         }
@@ -59,92 +36,44 @@ namespace ActionMarque
             var symbols = new[] { "AAPL", "TSLA", "NKE" };
             var colors = new[] { Color.Red, Color.Green, Color.Blue };
 
-            using (var http = new HttpClient())
-            {
-                await LoadAlphaVantageAsync(http, symbols, colors);
-            }
-
-            SetFixedXAxisRange(chart, "main", 2019, 2025);
-        }
-
-        private async Task LoadAlphaVantageAsync(HttpClient http, string[] symbols, Color[] colors)
-        {
+            var http = new HttpClient();
             var api = new AlphaVantageClient(http);
 
-            for (int i = 0; i < symbols.Length; i++)
-            {
-                try
-                {
-                    var data = await api.GetMonthlyCloseAsync(symbols[i], "9B4ZAIY8PY127RW3");
-                    var series = chart.Series.FirstOrDefault(s => s.Name == symbols[i]);
-                    if (series == null)
-                    {
-                        series = new Series(symbols[i])
-                        {
-                            ChartType = SeriesChartType.Line,
-                            BorderWidth = 3,
-                            Color = colors[i],
-                            ChartArea = "main"
-                        };
-                        chart.Series.Add(series);
-                    }
-                    series.Points.Clear();
-                    foreach (var kv in data.OrderBy(d => d.Key))
-                        series.Points.AddXY(kv.Value, kv.Value);
-                }
-                catch (Exception ex)
-                {
-                    // Optional: show once
-                    if (!chart.Titles.Any()) chart.Titles.Add("AlphaVantage data unavailable");
-                }
-            }
+            symbols.Select((sym, i) => new { sym, color = colors[i] })
+                   .ToList()
+                   .ForEach(async x =>
+                   {
+                       try
+                       {
+                           var data = (await api.GetMonthlyCloseAsync(x.sym, "9B4ZAIY8PY127RW3"))
+                                      .OrderBy(kv => kv.Key)
+                                      .ToList();
+
+                           if (!data.Any())
+                           {
+                               chart.Titles.Add($"{x.sym} data unavailable");
+                               return;
+                           }
+
+                           var series = new Series(x.sym)
+                           {
+                               ChartType = SeriesChartType.Line,
+                               BorderWidth = 3,
+                               Color = x.color,
+                               ChartArea = "main",
+                               XValueType = ChartValueType.DateTime
+                           };
+
+                           data.ForEach(kv => series.Points.AddXY(kv.Key, kv.Value));
+                           chart.Series.Add(series);
+                       }
+                       catch
+                       {
+                           chart.Titles.Add($"{x.sym} data unavailable");
+                       }
+                   });
+
+            chart.ChartAreas["main"].RecalculateAxesScale();
         }
-
-        private void ApplyXAxisRange(Chart chart, string chartAreaName)
-        {
-            var allPoints = chart.Series
-                .SelectMany(s => s.Points.Cast<DataPoint>())
-                .ToList();
-            if (!allPoints.Any()) return;
-
-            var minOa = allPoints.Min(p => p.XValue);
-            var maxOa = allPoints.Max(p => p.XValue);
-
-            var area = chart.ChartAreas[chartAreaName];
-            // Expand to whole years
-            var minDt = new DateTime(DateTime.FromOADate(minOa).Year, 1, 1);
-            var maxDt = new DateTime(DateTime.FromOADate(maxOa).Year, 12, 31);
-            area.AxisX.Minimum = minDt.ToOADate();
-            area.AxisX.Maximum = maxDt.ToOADate();
-            area.AxisX.IntervalType = DateTimeIntervalType.Years;
-            area.AxisX.Interval = 1;
-            area.AxisX.LabelStyle.Format = "yyyy";
-        }
-
-        private void ApplyDefaultXAxisRange(Chart chart, string chartAreaName)
-        {
-            var area = chart.ChartAreas[chartAreaName];
-            var now = DateTime.Now;
-            var minDt = new DateTime(now.Year - 1, 1, 1);
-            var maxDt = new DateTime(now.Year, 12, 31);
-            area.AxisX.Minimum = minDt.ToOADate();
-            area.AxisX.Maximum = maxDt.ToOADate();
-            area.AxisX.IntervalType = DateTimeIntervalType.Years;
-            area.AxisX.Interval = 1;
-            area.AxisX.LabelStyle.Format = "yyyy";
-        }
-
-        private void SetFixedXAxisRange(Chart chart, string chartAreaName, int minYear, int maxYear)
-        {
-            var area = chart.ChartAreas[chartAreaName];
-            var minDt = new DateTime(minYear, 1, 1);
-            var maxDt = new DateTime(maxYear, 12, 31);
-            area.AxisX.Minimum = minDt.ToOADate();
-            area.AxisX.Maximum = maxDt.ToOADate();
-            area.AxisX.IntervalType = DateTimeIntervalType.Years;
-            area.AxisX.Interval = 1;
-            area.AxisX.LabelStyle.Format = "yyyy";
-        }
-
     }
 }

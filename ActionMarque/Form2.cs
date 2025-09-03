@@ -49,19 +49,28 @@ namespace ActionMarque
             {
                 for (int i = 0; i < symbols.Length; i++)
                 {
-                    var url = $"https://api.marketstack.com/v1/eod?access_key=006fe7d63a19548a4c9f4a6beaa755ba&symbols={Uri.EscapeDataString(symbols[i])}&date_from=2019-01-01&date_to=2025-12-31&limit=500";
-                    var json = await http.GetStringAsync(url);
-
-                    var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
-                    var points = (obj["data"] ?? new Newtonsoft.Json.Linq.JArray())
-                        .Select(t => new
-                        {
-                            Date = (DateTime?)t["date"] ?? default(DateTime),
-                            Close = (double?)t["close"] ?? 0d
-                        })
-                        .Where(p => p.Date != default(DateTime))
-                        .OrderBy(p => p.Date)
-                        .ToList();
+                    var all = new System.Collections.Generic.List<(DateTime Date, double Close)>();
+                    int offset = 0;
+                    while (true)
+                    {
+                        var url = $"https://api.marketstack.com/v1/eod?access_key=006fe7d63a19548a4c9f4a6beaa755ba&symbols={Uri.EscapeDataString(symbols[i])}&date_from=2019-01-01&date_to=2025-12-31&limit=100&offset={offset}";
+                        var json = await http.GetStringAsync(url);
+                        var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+                        var page = (obj["data"] ?? new Newtonsoft.Json.Linq.JArray())
+                            .Select(t => new
+                            {
+                                Date = (DateTime?)t["date"] ?? default(DateTime),
+                                Close = (double?)t["close"] ?? 0d
+                            })
+                            .Where(p => p.Date != default(DateTime))
+                            .Select(p => (p.Date, p.Close))
+                            .ToList();
+                        if (page.Count == 0) break;
+                        all.AddRange(page);
+                        offset += page.Count;
+                        if (offset >= 1000) break; // safety cap
+                    }
+                    var points = all.OrderBy(p => p.Date).ToList();
 
                     var series = chart.Series.FirstOrDefault(s => s.Name == symbols[i]);
                     if (series == null)

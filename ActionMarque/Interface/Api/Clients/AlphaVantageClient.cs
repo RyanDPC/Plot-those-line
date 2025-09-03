@@ -20,6 +20,9 @@ namespace ActionMarque.Interface.Api.Clients
         {
             var obj = await _client.QueryAsync("TIME_SERIES_MONTHLY", symbol, apiKey);
             var json = obj as JObject ?? JObject.Parse(obj?.ToString() ?? "{}");
+
+            Console.WriteLine(json.ToString()); // <-- Ajouter pour debug
+
             var monthly = json["Monthly Time Series"] as JObject;
             if (monthly == null) return new Dictionary<DateTime, double>();
 
