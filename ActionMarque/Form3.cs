@@ -14,7 +14,21 @@ namespace ActionMarque
         private Label lblMinValue;
         private Label lblMaxValue;
         private Label lblAverageValue;
-        private ListBox brandList;
+        private CheckedListBox brandList;
+        private TextBox txtName;
+        private TextBox txtValues;
+        private Button btnAdd;
+        private Button btnRemove;
+        private List<Color> colorPalette = new List<Color> { Color.DodgerBlue, Color.Orange, Color.LimeGreen, Color.Gold, Color.Violet, Color.Tomato, Color.Cyan, Color.Silver, Color.Khaki, Color.Magenta };
+        private int colorIndex = 0;
+        private const int baseYear = 2019;
+
+        private class BrandItem
+        {
+            public string Name { get; set; }
+            public string DisplayText { get; set; }
+            public override string ToString() => DisplayText;
+        }
 
         public Form3()
         {
@@ -140,19 +154,89 @@ namespace ActionMarque
 
             yPos += 50;
 
-            // Liste des marques
-            brandList = new ListBox
+            // Liste des marques (cochable pour afficher/masquer)
+            brandList = new CheckedListBox
             {
                 Location = new Point(0, yPos),
                 Size = new Size(250, 200),
                 BackColor = Color.Black,
                 ForeColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
-                Font = new Font("Arial", 10)
+                Font = new Font("Arial", 10),
+                CheckOnClick = true
             };
+            brandList.ItemCheck += BrandList_ItemCheck;
             rightPanel.Controls.Add(brandList);
 
             yPos += 220;
+
+            // Champs simples pour ajouter/supprimer
+            var lblNom = new Label
+            {
+                Text = "Nom :",
+                ForeColor = Color.White,
+                Font = new Font("Arial", 10),
+                Location = new Point(0, yPos),
+                AutoSize = true
+            };
+            rightPanel.Controls.Add(lblNom);
+
+            txtName = new TextBox
+            {
+                Location = new Point(60, yPos - 2),
+                Size = new Size(190, 22),
+                BackColor = Color.FromArgb(30, 30, 30),
+                ForeColor = Color.White,
+            };
+            rightPanel.Controls.Add(txtName);
+
+            yPos += spacing;
+
+            var lblVals = new Label
+            {
+                Text = "Valeurs (2019→) :",
+                ForeColor = Color.White,
+                Font = new Font("Arial", 10),
+                Location = new Point(0, yPos),
+                AutoSize = true
+            };
+            rightPanel.Controls.Add(lblVals);
+
+            txtValues = new TextBox
+            {
+                Location = new Point(120, yPos - 2),
+                Size = new Size(130, 22),
+                BackColor = Color.FromArgb(30, 30, 30),
+                ForeColor = Color.White,
+                Text = "100,120,140"
+            };
+            rightPanel.Controls.Add(txtValues);
+
+            yPos += spacing;
+
+            btnAdd = new Button
+            {
+                Text = "+ Ajouter",
+                Location = new Point(0, yPos - 4),
+                Size = new Size(120, 26),
+                BackColor = Color.FromArgb(45, 45, 45),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnAdd.Click += BtnAdd_Click;
+            rightPanel.Controls.Add(btnAdd);
+
+            btnRemove = new Button
+            {
+                Text = "- Supprimer",
+                Location = new Point(130, yPos - 4),
+                Size = new Size(120, 26),
+                BackColor = Color.FromArgb(45, 45, 45),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnRemove.Click += BtnRemove_Click;
+            rightPanel.Controls.Add(btnRemove);
 
             // Statistiques
             var lblMin = new Label
@@ -160,7 +244,7 @@ namespace ActionMarque
                 Text = "Minimum :",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10),
-                Location = new Point(0, yPos),
+                Location = new Point(0, yPos + spacing),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblMin);
@@ -170,7 +254,7 @@ namespace ActionMarque
                 Text = "",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(80, yPos),
+                Location = new Point(80, yPos + spacing),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblMinValue);
@@ -180,7 +264,7 @@ namespace ActionMarque
                 Text = "Maximum :",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10),
-                Location = new Point(0, yPos + spacing),
+                Location = new Point(0, yPos + spacing * 2),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblMax);
@@ -190,7 +274,7 @@ namespace ActionMarque
                 Text = "",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(80, yPos + spacing),
+                Location = new Point(80, yPos + spacing * 2),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblMaxValue);
@@ -200,7 +284,7 @@ namespace ActionMarque
                 Text = "Moyenne :",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10),
-                Location = new Point(0, yPos + spacing * 2),
+                Location = new Point(0, yPos + spacing * 3),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblAverage);
@@ -210,7 +294,7 @@ namespace ActionMarque
                 Text = "",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(80, yPos + spacing * 2),
+                Location = new Point(80, yPos + spacing * 3),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblAverageValue);
@@ -218,80 +302,149 @@ namespace ActionMarque
 
         private void LoadData()
         {
-            // Ajouter les marques à la liste
-            var brands = new[] { "Apple", "Tesla", "Nike", "Samsung", "Celio", "Pull & Bear", "Ferrari", "Rolex", "Coca Cola", "Pepsi" };
-            foreach (var brand in brands)
+            brandList.Items.Clear();
+
+            // Données simples de départ
+            AddBrandSeries("Apple", new[] { 150.0, 200.0, 130.0, 180.0, 190.0 });
+            AddBrandSeries("Tesla", new[] { 60.0, 200.0, 400.0, 200.0, 250.0 });
+            AddBrandSeries("Nike", new[] { 80.0, 100.0, 120.0, 110.0, 130.0 });
+
+            UpdateStatsAndAxes();
+        }
+
+        private void AddBrandSeries(string name, double[] values, Color? fixedColor = null)
+        {
+            // Supprimer série existante si nécessaire
+            var existing = chart.Series.FindByName(name);
+            if (existing != null)
             {
-                brandList.Items.Add($"● {brand}");
+                chart.Series.Remove(existing);
             }
 
-            // Données pour le graphique
-            var allValues = new List<double>();
-
-            // Apple (AAPL)
-            var appleSeries = new Series("AAPL")
+            var seriesColor = fixedColor ?? colorPalette[colorIndex++ % colorPalette.Count];
+            var s = new Series(name)
             {
                 ChartType = SeriesChartType.Line,
                 BorderWidth = 3,
-                Color = Color.Blue,
+                Color = seriesColor,
                 ChartArea = "main",
-                XValueType = ChartValueType.DateTime
+                XValueType = ChartValueType.DateTime,
+                Enabled = true
             };
-            appleSeries.Points.AddXY(new DateTime(2019, 1, 1), 150);
-            appleSeries.Points.AddXY(new DateTime(2020, 1, 1), 200);
-            appleSeries.Points.AddXY(new DateTime(2021, 1, 1), 130);
-            appleSeries.Points.AddXY(new DateTime(2022, 1, 1), 180);
-            appleSeries.Points.AddXY(new DateTime(2023, 1, 1), 190);
-            chart.Series.Add(appleSeries);
-            allValues.AddRange(new[] { 150, 200, 130, 180, 190 });
 
-            // Tesla (TSLA)
-            var teslaSeries = new Series("TSLA")
+            for (int i = 0; i < values.Length; i++)
             {
-                ChartType = SeriesChartType.Line,
-                BorderWidth = 3,
-                Color = Color.Orange,
-                ChartArea = "main",
-                XValueType = ChartValueType.DateTime
-            };
-            teslaSeries.Points.AddXY(new DateTime(2019, 1, 1), 60);
-            teslaSeries.Points.AddXY(new DateTime(2020, 1, 1), 200);
-            teslaSeries.Points.AddXY(new DateTime(2021, 1, 1), 400);
-            teslaSeries.Points.AddXY(new DateTime(2022, 1, 1), 200);
-            teslaSeries.Points.AddXY(new DateTime(2023, 1, 1), 250);
-            chart.Series.Add(teslaSeries);
-            allValues.AddRange(new[] { 60, 200, 400, 200, 250 });
+                s.Points.AddXY(new DateTime(baseYear + i, 1, 1), values[i]);
+            }
+            chart.Series.Add(s);
 
-            // Nike (NKE)
-            var nikeSeries = new Series("NKE")
+            // Mettre à jour/ajouter l'élément dans la liste cochable
+            RemoveBrandItemIfExists(name);
+            var emoji = ComputeTrendEmoji(values);
+            var item = new BrandItem { Name = name, DisplayText = emoji + " " + name };
+            brandList.Items.Add(item, true);
+        }
+
+        private void RemoveBrandItemIfExists(string name)
+        {
+            for (int i = brandList.Items.Count - 1; i >= 0; i--)
             {
-                ChartType = SeriesChartType.Line,
-                BorderWidth = 3,
-                Color = Color.Green,
-                ChartArea = "main",
-                XValueType = ChartValueType.DateTime
-            };
-            nikeSeries.Points.AddXY(new DateTime(2019, 1, 1), 80);
-            nikeSeries.Points.AddXY(new DateTime(2020, 1, 1), 100);
-            nikeSeries.Points.AddXY(new DateTime(2021, 1, 1), 120);
-            nikeSeries.Points.AddXY(new DateTime(2022, 1, 1), 110);
-            nikeSeries.Points.AddXY(new DateTime(2023, 1, 1), 130);
-            chart.Series.Add(nikeSeries);
-            allValues.AddRange(new[] { 80, 100, 120, 110, 130 });
+                var it = brandList.Items[i] as BrandItem;
+                if (it != null && it.Name == name)
+                {
+                    brandList.Items.RemoveAt(i);
+                }
+            }
+        }
 
-            // Calculer et afficher les statistiques
-            if (allValues.Any())
+        private static string ComputeTrendEmoji(IReadOnlyList<double> values)
+        {
+            if (values.Count == 0) return "⚪";
+            var diff = values[values.Count - 1] - values[0];
+            if (diff > 0) return "🟢";
+            if (diff < 0) return "🔴";
+            return "⚪";
+        }
+
+        private void BrandList_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            // Afficher/masquer série
+            var item = brandList.Items[e.Index] as BrandItem;
+            if (item != null)
             {
-                var min = allValues.Min();
-                var max = allValues.Max();
-                var average = allValues.Average();
+                var series = chart.Series.FindByName(item.Name);
+                if (series != null)
+                {
+                    series.Enabled = (e.NewValue == CheckState.Checked);
+                }
+            }
+            // Recalculer après que l'état ait changé (post event)
+            this.BeginInvoke(new Action(UpdateStatsAndAxes));
+        }
 
-                lblMinValue.Text = min.ToString("N2");
-                lblMaxValue.Text = max.ToString("N2");
-                lblAverageValue.Text = average.ToString("N2");
+        private void BtnAdd_Click(object sender, EventArgs e)
+        {
+            var name = (txtName.Text ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            var parsed = ParseValues(txtValues.Text);
+            if (parsed.Length == 0) return;
+
+            AddBrandSeries(name, parsed);
+            UpdateStatsAndAxes();
+        }
+
+        private void BtnRemove_Click(object sender, EventArgs e)
+        {
+            if (brandList.SelectedItem is BrandItem item)
+            {
+                var s = chart.Series.FindByName(item.Name);
+                if (s != null) chart.Series.Remove(s);
+                brandList.Items.Remove(item);
+                UpdateStatsAndAxes();
+            }
+        }
+
+        private static double[] ParseValues(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return Array.Empty<double>();
+            var parts = input.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var list = new List<double>();
+            foreach (var p in parts)
+            {
+                if (double.TryParse(p.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double v))
+                {
+                    list.Add(v);
+                }
+            }
+            return list.ToArray();
+        }
+
+        private void UpdateStatsAndAxes()
+        {
+            var values = new List<double>();
+            foreach (var s in chart.Series)
+            {
+                if (!s.Enabled) continue;
+                foreach (var dp in s.Points)
+                {
+                    values.Add(dp.YValues[0]);
+                }
             }
 
-            // Recalculer les axes
+            if (values.Count > 0)
+            {
+                lblMinValue.Text = values.Min().ToString("N2");
+                lblMaxValue.Text = values.Max().ToString("N2");
+                lblAverageValue.Text = values.Average().ToString("N2");
+            }
+            else
+            {
+                lblMinValue.Text = "—";
+                lblMaxValue.Text = "—";
+                lblAverageValue.Text = "—";
+            }
+
             chart.ChartAreas["main"].RecalculateAxesScale();
         }
 
