@@ -14,7 +14,18 @@ namespace ActionMarque
         private Label lblMinValue;
         private Label lblMaxValue;
         private Label lblAverageValue;
-        private ListBox brandList;
+        private CheckedListBox brandList;
+        private Dictionary<string, List<double>> brandNameToValues = new Dictionary<string, List<double>>();
+        private Dictionary<string, Color> brandStatusColor = new Dictionary<string, Color>();
+        private readonly List<DateTime> years = new List<DateTime>
+        {
+            new DateTime(2019,1,1),
+            new DateTime(2020,1,1),
+            new DateTime(2021,1,1),
+            new DateTime(2022,1,1),
+            new DateTime(2023,1,1)
+        };
+        private readonly Random random = new Random();
 
         public Form3()
         {
@@ -127,32 +138,71 @@ namespace ActionMarque
             int yPos = 20;
             int spacing = 30;
 
-            // Titre
+            // En-tête avec boutons + / -
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, yPos),
+                Size = new Size(260, 36),
+                BackColor = Color.Black
+            };
+            rightPanel.Controls.Add(headerPanel);
+
             var titleLabel = new Label
             {
                 Text = "Marques",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 12, FontStyle.Bold),
-                Location = new Point(0, yPos),
+                Location = new Point(0, 8),
                 AutoSize = true
             };
-            rightPanel.Controls.Add(titleLabel);
+            headerPanel.Controls.Add(titleLabel);
+
+            var btnAdd = new Button
+            {
+                Text = "+",
+                ForeColor = Color.Black,
+                BackColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(28, 28),
+                Location = new Point(170, 4)
+            };
+            btnAdd.FlatAppearance.BorderSize = 0;
+            btnAdd.Click += (s, e) => OnAddBrand();
+            headerPanel.Controls.Add(btnAdd);
+
+            var btnRemove = new Button
+            {
+                Text = "-",
+                ForeColor = Color.Black,
+                BackColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(28, 28),
+                Location = new Point(204, 4)
+            };
+            btnRemove.FlatAppearance.BorderSize = 0;
+            btnRemove.Click += (s, e) => OnRemoveSelectedBrands();
+            headerPanel.Controls.Add(btnRemove);
 
             yPos += 50;
 
-            // Liste des marques
-            brandList = new ListBox
+            // Liste des marques (cochable, owner-draw pour point coloré)
+            brandList = new CheckedListBox
             {
                 Location = new Point(0, yPos),
-                Size = new Size(250, 200),
+                Size = new Size(260, 250),
                 BackColor = Color.Black,
                 ForeColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
-                Font = new Font("Arial", 10)
+                Font = new Font("Arial", 10),
+                CheckOnClick = true,
+                DrawMode = DrawMode.OwnerDrawFixed,
+                ItemHeight = 22
             };
+            brandList.DrawItem += BrandList_DrawItem;
+            brandList.ItemCheck += BrandList_ItemCheck;
             rightPanel.Controls.Add(brandList);
 
-            yPos += 220;
+            yPos += 270;
 
             // Statistiques
             var lblMin = new Label
@@ -170,7 +220,7 @@ namespace ActionMarque
                 Text = "",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(80, yPos),
+                Location = new Point(90, yPos),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblMinValue);
@@ -190,7 +240,7 @@ namespace ActionMarque
                 Text = "",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(80, yPos + spacing),
+                Location = new Point(90, yPos + spacing),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblMaxValue);
@@ -210,7 +260,7 @@ namespace ActionMarque
                 Text = "",
                 ForeColor = Color.White,
                 Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(80, yPos + spacing * 2),
+                Location = new Point(90, yPos + spacing * 2),
                 AutoSize = true
             };
             rightPanel.Controls.Add(lblAverageValue);
@@ -218,81 +268,238 @@ namespace ActionMarque
 
         private void LoadData()
         {
-            // Ajouter les marques à la liste
-            var brands = new[] { "Apple", "Tesla", "Nike", "Samsung", "Celio", "Pull & Bear", "Ferrari", "Rolex", "Coca Cola", "Pepsi" };
-            foreach (var brand in brands)
+            // Préparer les données de base pour plusieurs marques
+            brandNameToValues["Apple"] = new List<double> { 150, 200, 130, 180, 190 };
+            brandNameToValues["Tesla"] = new List<double> { 60, 200, 400, 200, 250 };
+            brandNameToValues["Nike"] = new List<double> { 80, 100, 120, 110, 130 };
+            brandNameToValues["Samsung"] = GenerateRandomValues(80, 220, drift: 10);
+            brandNameToValues["Celio"] = GenerateRandomValues(20, 90, drift: -2);
+            brandNameToValues["Pull & Bear"] = GenerateRandomValues(30, 120, drift: 3);
+            brandNameToValues["Ferrari"] = GenerateRandomValues(100, 400, drift: 15);
+            brandNameToValues["Rolex"] = GenerateRandomValues(200, 500, drift: 8);
+            brandNameToValues["Coca Cola"] = GenerateRandomValues(60, 140, drift: 1);
+            brandNameToValues["Pepsi"] = GenerateRandomValues(55, 135, drift: 1);
+
+            // Mettre à jour les couleurs de statut en fonction de la tendance
+            foreach (var kvp in brandNameToValues)
             {
-                brandList.Items.Add($"● {brand}");
+                brandStatusColor[kvp.Key] = GetStatusColor(kvp.Value);
             }
 
-            // Données pour le graphique
-            var allValues = new List<double>();
+            // Remplir la liste: premières marques cochées (affichées)
+            AddBrandToList("Apple", isChecked: true);
+            AddBrandToList("Tesla", isChecked: true);
+            AddBrandToList("Nike", isChecked: true);
 
-            // Apple (AAPL)
-            var appleSeries = new Series("AAPL")
+            // Les autres non cochées par défaut
+            var others = new[] { "Samsung", "Celio", "Pull & Bear", "Ferrari", "Rolex", "Coca Cola", "Pepsi" };
+            foreach (var b in others)
             {
-                ChartType = SeriesChartType.Line,
-                BorderWidth = 3,
-                Color = Color.Blue,
-                ChartArea = "main",
-                XValueType = ChartValueType.DateTime
-            };
-            appleSeries.Points.AddXY(new DateTime(2019, 1, 1), 150);
-            appleSeries.Points.AddXY(new DateTime(2020, 1, 1), 200);
-            appleSeries.Points.AddXY(new DateTime(2021, 1, 1), 130);
-            appleSeries.Points.AddXY(new DateTime(2022, 1, 1), 180);
-            appleSeries.Points.AddXY(new DateTime(2023, 1, 1), 190);
-            chart.Series.Add(appleSeries);
-            allValues.AddRange(new[] { 150, 200, 130, 180, 190 });
-
-            // Tesla (TSLA)
-            var teslaSeries = new Series("TSLA")
-            {
-                ChartType = SeriesChartType.Line,
-                BorderWidth = 3,
-                Color = Color.Orange,
-                ChartArea = "main",
-                XValueType = ChartValueType.DateTime
-            };
-            teslaSeries.Points.AddXY(new DateTime(2019, 1, 1), 60);
-            teslaSeries.Points.AddXY(new DateTime(2020, 1, 1), 200);
-            teslaSeries.Points.AddXY(new DateTime(2021, 1, 1), 400);
-            teslaSeries.Points.AddXY(new DateTime(2022, 1, 1), 200);
-            teslaSeries.Points.AddXY(new DateTime(2023, 1, 1), 250);
-            chart.Series.Add(teslaSeries);
-            allValues.AddRange(new[] { 60, 200, 400, 200, 250 });
-
-            // Nike (NKE)
-            var nikeSeries = new Series("NKE")
-            {
-                ChartType = SeriesChartType.Line,
-                BorderWidth = 3,
-                Color = Color.Green,
-                ChartArea = "main",
-                XValueType = ChartValueType.DateTime
-            };
-            nikeSeries.Points.AddXY(new DateTime(2019, 1, 1), 80);
-            nikeSeries.Points.AddXY(new DateTime(2020, 1, 1), 100);
-            nikeSeries.Points.AddXY(new DateTime(2021, 1, 1), 120);
-            nikeSeries.Points.AddXY(new DateTime(2022, 1, 1), 110);
-            nikeSeries.Points.AddXY(new DateTime(2023, 1, 1), 130);
-            chart.Series.Add(nikeSeries);
-            allValues.AddRange(new[] { 80, 100, 120, 110, 130 });
-
-            // Calculer et afficher les statistiques
-            if (allValues.Any())
-            {
-                var min = allValues.Min();
-                var max = allValues.Max();
-                var average = allValues.Average();
-
-                lblMinValue.Text = min.ToString("N2");
-                lblMaxValue.Text = max.ToString("N2");
-                lblAverageValue.Text = average.ToString("N2");
+                AddBrandToList(b, isChecked: false);
             }
 
-            // Recalculer les axes
+            // Dessiner les séries selon les cases cochées
+            RenderChartFromCheckedBrands();
+        }
+
+        private void AddBrandToList(string brand, bool isChecked)
+        {
+            if (!brandNameToValues.ContainsKey(brand)) return;
+            int index = brandList.Items.Add(brand, isChecked);
+            // Stocker la couleur de statut si manquante
+            if (!brandStatusColor.ContainsKey(brand))
+            {
+                brandStatusColor[brand] = GetStatusColor(brandNameToValues[brand]);
+            }
+        }
+
+        private List<double> GenerateRandomValues(int min, int max, int drift)
+        {
+            var list = new List<double>();
+            double value = random.Next(min, max);
+            for (int i = 0; i < years.Count; i++)
+            {
+                // petite dérive et bruit
+                value += drift + random.Next(-15, 16);
+                value = Math.Max(min, Math.Min(max, value));
+                list.Add(Math.Round(value, 0));
+            }
+            return list;
+        }
+
+        private Color GetStatusColor(List<double> values)
+        {
+            if (values == null || values.Count < 2) return Color.Gray;
+            double last = values[values.Count - 1];
+            double prev = values[values.Count - 2];
+            if (last > prev) return Color.LimeGreen;
+            if (last < prev) return Color.Red;
+            return Color.Gray;
+        }
+
+        private void RenderChartFromCheckedBrands()
+        {
+            chart.Series.Clear();
+
+            // Palette de couleurs de ligne
+            var lineColors = new[] { Color.DodgerBlue, Color.Orange, Color.LimeGreen, Color.MediumVioletRed, Color.Gold, Color.MediumTurquoise, Color.Plum, Color.Tomato, Color.Sienna, Color.SkyBlue };
+            int colorIndex = 0;
+
+            var visibleValues = new List<double>();
+
+            foreach (var item in brandList.CheckedItems)
+            {
+                string brand = item.ToString();
+                if (!brandNameToValues.TryGetValue(brand, out var values)) continue;
+
+                var series = new Series(brand)
+                {
+                    ChartType = SeriesChartType.Line,
+                    BorderWidth = 3,
+                    Color = lineColors[colorIndex % lineColors.Length],
+                    ChartArea = "main",
+                    XValueType = ChartValueType.DateTime
+                };
+
+                for (int i = 0; i < years.Count && i < values.Count; i++)
+                {
+                    series.Points.AddXY(years[i], values[i]);
+                    visibleValues.Add(values[i]);
+                }
+
+                chart.Series.Add(series);
+                colorIndex++;
+            }
+
+            // Statistiques basées sur les séries visibles
+            if (visibleValues.Any())
+            {
+                lblMinValue.Text = visibleValues.Min().ToString("N0");
+                lblMaxValue.Text = visibleValues.Max().ToString("N0");
+                lblAverageValue.Text = visibleValues.Average().ToString("N0");
+            }
+            else
+            {
+                lblMinValue.Text = "-";
+                lblMaxValue.Text = "-";
+                lblAverageValue.Text = "-";
+            }
+
             chart.ChartAreas["main"].RecalculateAxesScale();
+            brandList.Invalidate();
+        }
+
+        private void BrandList_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            // Retarder le rendu jusqu'après la mise à jour de l'état
+            this.BeginInvoke((Action)(() => RenderChartFromCheckedBrands()));
+        }
+
+        private void BrandList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0 || e.Index >= brandList.Items.Count) return;
+
+            e.DrawBackground();
+            string brand = brandList.Items[e.Index].ToString();
+            bool isChecked = brandList.GetItemChecked(e.Index);
+
+            // Couleurs
+            Color textColor = Color.White;
+            Color statusColor = brandStatusColor.ContainsKey(brand) ? brandStatusColor[brand] : Color.Gray;
+
+            // Dessiner point coloré
+            int dotSize = 10;
+            var dotRect = new Rectangle(e.Bounds.X + 4, e.Bounds.Y + (e.Bounds.Height - dotSize) / 2, dotSize, dotSize);
+            using (var brush = new SolidBrush(statusColor))
+            {
+                e.Graphics.FillEllipse(brush, dotRect);
+            }
+
+            // Dessiner le nom
+            using (var brushText = new SolidBrush(textColor))
+            {
+                e.Graphics.DrawString(brand, e.Font, brushText, e.Bounds.X + 20, e.Bounds.Y + 3);
+            }
+
+            // Indication visuelle pour élément coché
+            if (isChecked)
+            {
+                using (var pen = new Pen(Color.FromArgb(80, 255, 255, 255)))
+                {
+                    e.Graphics.DrawRectangle(pen, e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
+                }
+            }
+
+            e.DrawFocusRectangle();
+        }
+
+        private void OnAddBrand()
+        {
+            string name = PromptForText("Nom de la marque:", "Ajouter une marque");
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            if (brandNameToValues.ContainsKey(name))
+            {
+                MessageBox.Show("Cette marque existe déjà.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Générer des valeurs plausibles
+            var values = GenerateRandomValues(50, 300, drift: random.Next(-5, 12));
+            brandNameToValues[name] = values;
+            brandStatusColor[name] = GetStatusColor(values);
+
+            int idx = brandList.Items.Add(name, true);
+            brandList.SelectedIndex = idx;
+            RenderChartFromCheckedBrands();
+        }
+
+        private void OnRemoveSelectedBrands()
+        {
+            var indices = brandList.SelectedIndices;
+            if (indices == null || indices.Count == 0)
+            {
+                MessageBox.Show("Sélectionnez au moins une marque à supprimer.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Supprimer en partant de la fin
+            for (int i = indices.Count - 1; i >= 0; i--)
+            {
+                int idx = indices[i];
+                string brand = brandList.Items[idx].ToString();
+                brandList.Items.RemoveAt(idx);
+                brandNameToValues.Remove(brand);
+                brandStatusColor.Remove(brand);
+            }
+
+            RenderChartFromCheckedBrands();
+        }
+
+        private string PromptForText(string text, string caption)
+        {
+            var form = new Form
+            {
+                Width = 360,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = caption,
+                StartPosition = FormStartPosition.CenterParent,
+                BackColor = Color.White
+            };
+
+            var lbl = new Label { Left = 10, Top = 15, Text = text, AutoSize = true };
+            var box = new TextBox { Left = 10, Top = 40, Width = 320 };
+            var ok = new Button { Text = "OK", Left = 170, Width = 70, Top = 70, DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = "Annuler", Left = 250, Width = 80, Top = 70, DialogResult = DialogResult.Cancel };
+            form.Controls.Add(lbl);
+            form.Controls.Add(box);
+            form.Controls.Add(ok);
+            form.Controls.Add(cancel);
+            form.AcceptButton = ok;
+            form.CancelButton = cancel;
+
+            return form.ShowDialog(this) == DialogResult.OK ? box.Text?.Trim() : null;
         }
 
         private void InitializeComponent()
