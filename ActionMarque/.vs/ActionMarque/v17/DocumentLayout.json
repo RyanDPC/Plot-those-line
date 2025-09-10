@@ -7,11 +7,11 @@
       "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|c:\\users\\pa70iyc\\documents\\github\\plot-those-line\\actionmarque\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|c:\\users\\pa70iyc\\documents\\github\\plot-those-line\\actionmarque\\alphavantageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\alphavantageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:alphavantageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -48,7 +48,7 @@
               "RelativeDocumentMoniker": "AlphaVantageService.cs",
               "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\AlphaVantageService.cs",
               "RelativeToolTip": "AlphaVantageService.cs",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAADIAAABTAAAA",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAQwC8AAAA6AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-10T09:04:30.112Z",
               "EditorCaption": ""
@@ -61,7 +61,7 @@
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AQIAAFwAAAAAAAAAAAAswHAAAAATAAAA",
+              "ViewState": "AQIAAOoAAAAAAAAAAAAiwBwBAAAvAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-03T13:16:05.733Z",
               "EditorCaption": ""
@@ -74,9 +74,10 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAVAAAAAAAAAA==",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-03T13:10:48.817Z"
+              "WhenOpened": "2025-09-03T13:10:48.817Z",
+              "EditorCaption": ""
             }
           ]
         }

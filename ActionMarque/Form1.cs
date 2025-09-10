@@ -112,7 +112,7 @@ namespace ActionMarque
             chartArea.AxisY.MajorGrid.LineColor = Color.Gray;
             chartArea.AxisY.LabelStyle.ForeColor = Color.White;
             chartArea.AxisY.LineColor = Color.White;
-            chartArea.AxisY.Title = "Prix ($) - Données Alpha Vantage";
+            chartArea.AxisY.Title = "Prix ($)";
             chartArea.AxisY.TitleForeColor = Color.White;
             chartArea.AxisY.LabelStyle.Format = "#,0";
 
@@ -139,9 +139,8 @@ namespace ActionMarque
 
         private void SetupControls()
         {
-            // Design ultra simple et épuré
             int yPos = 30;
-            
+
             // Titre minimaliste
             var titleLabel = new Label
             {
@@ -172,17 +171,16 @@ namespace ActionMarque
             
             yPos += 70;
             
-            // Liste des marques ultra simple
             brandListPanel = new Panel
             {
                 Location = new Point(20, yPos),
-                Size = new Size(260, 400),
+                Size = new Size(260, 300),
                 BackColor = Color.Transparent,
                 AutoScroll = true
             };
             rightPanel.Controls.Add(brandListPanel);
             
-            yPos += 420;
+            yPos += 320;
             
             // Section d'ajout ultra simple
             var addSection = new Panel
@@ -213,10 +211,23 @@ namespace ActionMarque
                 ForeColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
                 Font = new Font("Segoe UI", 10),
-                Text = "AAPL"
+                Text = "AAPL",
+                Visible = false,
             };
             addSection.Controls.Add(txtValues);
-            
+            txtValues.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    string marque = txtValues.Text.Trim();
+                    if (!string.IsNullOrEmpty(marque))
+                    {
+                        AddBrandFromTextBox(marque);
+                        txtValues.Visible = false;
+                        txtValues.Text = "";
+                    }
+                }
+            };
             // Bouton supprimer simple
             btnDelete = new Button
             {
@@ -229,6 +240,7 @@ namespace ActionMarque
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
+           
             btnDelete.Click += BtnDelete_Click;
             addSection.Controls.Add(btnDelete);
         }
@@ -269,7 +281,7 @@ namespace ActionMarque
                 suppressItemCheckEvents = true;
                 
                 // Charger les données depuis l'API
-                var symbols = new[] { "AAPL", "TSLA", "NKE" }; // Apple, Tesla, Nike
+                var symbols = new[] { "AAPL" }; // Apple, Tesla, Nike
                 var brandData = await apiService.GetMultipleStocksDataAsync(symbols);
 
                 if (brandData.Count > 0)
@@ -289,11 +301,6 @@ namespace ActionMarque
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Erreur API: {ex.Message}");
-                
-                // Fallback vers les données statiques en cas d'erreur
-                AddBrandSeries("Apple", new[] { 150.0, 200.0, 130.0, 180.0, 190.0 });
-                AddBrandSeries("Tesla", new[] { 60.0, 200.0, 400.0, 200.0, 250.0 });
-                AddBrandSeries("Nike", new[] { 80.0, 100.0, 120.0, 110.0, 130.0 });
                 
                 RefreshBrandList();
             }
@@ -449,68 +456,44 @@ namespace ActionMarque
             {
                 series.Enabled = isVisible;
             }
-            // UpdateStatsAndAxes supprimé pour design simplifié
         }
 
         private void SelectBrand(BrandItem brand)
         {
+            txtValues.Visible = true;
             txtValues.Text = brand.Name;
+            txtValues.Focus();
         }
 
         private async void BtnAdd_Click(object sender, EventArgs e)
         {
-            var name = (txtValues.Text ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(name)) return;
-
-            // Afficher un message de chargement
-            var loadingLabel = new Label
-            {
-                Text = $"Chargement des données pour {name}...",
-                ForeColor = Color.Yellow,
-                Font = new Font("Arial", 10, FontStyle.Bold),
-                Location = new Point(10, 10),
-                AutoSize = true
-            };
-            brandListPanel.Controls.Add(loadingLabel);
-
+            txtValues.Visible = true;
+            txtValues.Focus();
+            txtValues.Text = "";
+            txtValues.BringToFront();
+        }
+        private async void AddBrandFromTextBox(string symbole)
+        {
             try
             {
-                // Essayer d'abord de récupérer les données depuis l'API
-                var data = await apiService.GetStockDataAsync(name);
+                var data = await apiService.GetStockDataAsync(symbole);
                 if (data.Count > 0)
                 {
                     var prices = data.Select(dp => dp.Price).ToArray();
-                    AddBrandSeries(name, prices);
+                    AddBrandSeries(symbole, prices);
                 }
                 else
                 {
-                    // Fallback vers les valeurs saisies
                     var parsed = ParseValues(txtValues.Text);
                     if (parsed.Length > 0)
-                    {
-                        AddBrandSeries(name, parsed);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Aucune donnée trouvée pour ce symbole et aucune valeur saisie.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
+                        AddBrandSeries(symbole, parsed);
                 }
 
                 RefreshBrandList();
-                
-                // Vider les champs
-                txtValues.Text = "";
-                txtValues.Text = "100,120,140";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des données pour {name}: {ex.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // Supprimer le message de chargement
-                brandListPanel.Controls.Remove(loadingLabel);
+                MessageBox.Show($"Erreur lors du chargement des données pour {symbole}: {ex.Message}");
             }
         }
 
@@ -532,7 +515,6 @@ namespace ActionMarque
             // Ajouter la nouvelle série
             AddBrandSeries(name, parsed);
             RefreshBrandList();
-            // UpdateStatsAndAxes supprimé pour design simplifié
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
@@ -551,9 +533,7 @@ namespace ActionMarque
             }
 
             RefreshBrandList();
-            // UpdateStatsAndAxes supprimé pour design simplifié
             
-            // Vider les champs
             txtValues.Text = "";
             txtValues.Text = "100,120,140";
         }
@@ -577,8 +557,6 @@ namespace ActionMarque
             }
             return list.ToArray();
         }
-
-        // Méthode UpdateStatsAndAxes supprimée pour design simplifié
 
     }
 }
