@@ -1,9 +1,8 @@
 ---
 title: "Rapport de Projet"
-author: "Nom de l’auteur – Classe"
-date: "Lieu – Durée"
-project_manager: "Nom du chef de projet"
-mandant: "Nom et adresse du mandant"
+author: "De Pina Correia Ryan – CID3A"
+date: "Lausanne, Vennes – 32p "
+project_manager: "Melly Jonathan"
 ---
 
 <p align="center" style="font-size:22px; font-weight:bold;">
@@ -24,7 +23,7 @@ _Mandant : Nom et adresse_
 # Table des matières
 - [1. Spécifications](#1-spécifications)
   - [1.1 Titre](#11-titre)
-  - [1.2 Description](#12-description)
+    - [Description](#12-description)
   - [1.3 Matériel et logiciels à disposition](#13-matériel-et-logiciels-à-disposition)
   - [1.4 Prérequis](#14-prérequis)
   - [1.5 Cahier des charges](#15-cahier-des-charges)
@@ -39,69 +38,145 @@ _Mandant : Nom et adresse_
   - [1.7 Validation et conditions de réussite](#17-validation-et-conditions-de-réussite)
 - [2. Planification Initiale](#2-planification-initiale)
 - [3. Analyse](#3-analyse)
-  - [3.1 Opportunités](#31-opportunités)
-  - [3.2 Document d’analyse et conception](#32-document-danalyse-et-conception)
-  - [3.3 Conception des tests](#33-conception-des-tests)
-  - [3.4 Planification détaillée](#34-planification-détaillée)
 - [4. Réalisation](#4-réalisation)
-  - [4.1 Dossier de réalisation](#41-dossier-de-réalisation)
-  - [4.2 Modifications](#42-modifications)
 - [5. Tests](#5-tests)
-  - [5.1 Dossier des tests](#51-dossier-des-tests)
 - [6. Conclusion](#6-conclusion)
-  - [6.1 Bilan des fonctionnalités demandées](#61-bilan-des-fonctionnalités-demandées)
-  - [6.2 Bilan de la planification](#62-bilan-de-la-planification)
-  - [6.3 Bilan personnel](#63-bilan-personnel)
 - [7. Divers](#7-divers)
-  - [7.1 Journal de travail](#71-journal-de-travail)
-  - [7.2 Bibliographie](#72-bibliographie)
-  - [7.3 Webographie](#73-webographie)
 - [8. Annexes](#8-annexes)
 
 ---
 
 # 1. Spécifications
 
-## 1.1 Titre  
-_A compléter_
-
-## 1.2 Description  
-_A compléter_
+## 1.1 Plot-Those-Line 
+### Description
+Concevoir un logiciel permettant d’afficher et d’analyser des séries temporelles sous forme graphique.  
+L’utilisateur pourra importer des données externes (CSV, JSON, API) et comparer plusieurs jeux de données simultanément.  
 
 ## 1.3 Matériel et logiciels à disposition  
-_A compléter_
+
+- **Visual Studio 2022**
+- **GitHub**
+  - Project
+  - Repository (repo)
+  - Roadmap
+  - User stories
+- **Python**
+- **API : Alpha Vantage**
+- **Figma**
 
 ## 1.4 Prérequis  
-_A compléter_
+- **ICT-323 Programmation fonctionnelle**
+- **C#**
+- **API REST (HttpClient)**
+- **Gestion de projet**
+- **Passion Lecture (mobile)**
+- **C335 (flashcards)**
 
 ## 1.5 Cahier des charges
 
+### Gestion de projet
+Les directives spécifiques à la gestion de projet vous seront fournies séparément par votre chef de projet.  
+Dans tous les cas, les points suivants doivent être respectés :
+
+1. Vous êtes inscrit au projet **P_FUN** sur Marketplace :  
+   [Lien vers Marketplace](https://apps.pm2etml.ch/jobDefinitions/102)
+
+2. Vous devez effectuer une **analyse sous forme de User Stories (US)**  
+   - Inclure les tests d’acceptance  
+   - Inclure des maquettes  
+   - Cette étape doit être réalisée avant de commencer à coder
+
+3. Vous devez fournir une **planification simple** de la réalisation de ces US avant de commencer à coder
+
+4. Vous devez tenir un **Journal de travail [Jdt.md]()**
+
+---
+
 ### 1.5.1 Objectifs et portée (SMART)  
-_A compléter_
+
+#### Objectif 1 : Réaliser un programme informatique de qualité
+- Organisé (namespace, classes, commit log, …)  
+- Compacté (pas de copié/collé)  
+- Optimisé (structures adaptées)  
+- Testé (tests unitaires)  
+- Commenté  
+- Complet (code, modèle de données, maquettes PDF, exécutable, …)  
+
+#### Objectif 2 : Prouver que vous êtes digne de confiance dans la gestion d’un projet
+- Journal de travail à jour  
+- Pro-activité (poser des questions au client, faire des démonstrations, utiliser Git pour versioning)  
+
+---
 
 ### 1.5.2 Caractéristiques des utilisateurs et impacts  
-_A compléter_
+- Public cible : utilisateurs ayant besoin d’analyser des données temporelles (finance, météo, santé, sport, etc.).  
+- Impacts attendus :  
+  - Gain de temps pour la comparaison de données.  
+  - Accessibilité via un outil ergonomique.  
+  - Flexibilité d’affichage des graphiques pour répondre à des besoins variés.  
+
+---
 
 ### 1.5.3 Fonctionnalités requises  
-_A compléter_
+- Afficher plusieurs séries temporelles simultanément.  
+- Offrir une flexibilité d’affichage pour analyser les données en détail.  
+- Importer des séries de données de manière permanente (CSV, JSON, API).  
+- Comparer plusieurs intervalles de temps pour une même donnée.  
+- Mode fonctions permettant d’afficher des expressions mathématiques (préconfigurées et personnalisées via Roslyn).  
+
+---
 
 ### 1.5.4 Contraintes  
-_A compléter_
+- Utiliser **LINQ** (pas de boucle `for`).  
+- Implémenter **au moins 2 extensions C#**.  
+- Utiliser une **librairie graphique** (Forms, MAUI, Uno, WPF, …).  
+- Utiliser une **librairie de visualisation de données** (ex. [ScottPlot](https://scottplot.net/)).  
+
+---
 
 ### 1.5.5 Travail à réaliser par l'apprenti  
-_A compléter_
+- Réalisation du code source et des fonctionnalités principales.  
+- Mise en place des tests unitaires et de validation.  
+- Rédaction du rapport PDF (introduction, planification, tests, journal de travail, usage de l’IA, conclusion).  
+- Publication sur GitHub (release incluant code + rapport).  
+
+---
 
 ### 1.5.6 Si le temps le permet  
-_A compléter_
+- Ajouter des options avancées d’affichage (filtres, zoom interactif, mise en forme personnalisée).  
+- Développer des connecteurs supplémentaires vers d’autres APIs publiques.  
+- Optimiser les performances pour de très grands jeux de données.  
+
+---
 
 ### 1.5.7 Méthodes de validation  
-_A compléter_
+- Vérification par tests unitaires et manuels.  
+- Démonstrations intermédiaires au client/chef de projet.  
+- Validation des User Stories (tests d’acceptance).  
+- Comparaison avec les spécifications initiales.  
+
+---
 
 ## 1.6 Points évalués  
-_A compléter_
+- Respect des **objectifs SMART**.  
+- Qualité et organisation du **code source**.  
+- Capacité à utiliser **GitHub** pour la gestion de projet.  
+- Exhaustivité et régularité du **journal de travail**.  
+- Pertinence de la **planification** et respect des délais.  
+- Clarté et qualité du **rapport PDF**.  
+- Autonomie, pro-activité et communication avec le client.  
+
+---
 
 ## 1.7 Validation et conditions de réussite  
-_A compléter_
+- Le projet est considéré comme réussi si :  
+  - Une **release GitHub** est disponible avec le code complet et fonctionnel.  
+  - Le **rapport PDF** contient toutes les sections requises (introduction, planification, tests, journal, IA, conclusion).  
+  - Les fonctionnalités principales (affichage de séries temporelles, importation, flexibilité d’affichage, mode fonctions) sont opérationnelles.  
+  - Les **tests unitaires** confirment le bon fonctionnement des composants critiques.  
+  - Le **journal de travail** est tenu régulièrement et reflète l’évolution du projet.  
+  - Le projet respecte les contraintes techniques et la planification validée avec le client.  
 
 ---
 
