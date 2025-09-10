@@ -13,13 +13,19 @@ import os
 def get_git_log():
     """
     Récupère l'historique Git sous forme de lignes formatées :
-    date|hash|message
+    date_iso|hash|message|timestamp
+    - date_iso: date au format ISO (YYYY-MM-DD)
+    - timestamp: epoch seconds (UTC) pour calculer les durées entre commits
     """
     result = subprocess.run(
-        ["git", "log", "--pretty=format:%ad|%h|%s", "--date=short"],
+        [
+            "git", "log",
+            "--pretty=format:%ad|%h|%s|%at",
+            "--date=short",
+        ],
         stdout=subprocess.PIPE,
         text=True,
-        check=True
+        check=True,
     )
     return result.stdout.strip().splitlines()
 
@@ -34,9 +40,26 @@ def week_range(year, week):
     end = start + datetime.timedelta(days=6)
     return start, end
 
-def format_commit(date_obj, commit_hash, message):
-    """Formate un commit pour Markdown."""
-    return f"- **{date_obj}** [`{commit_hash}`] : {message}"
+def format_duration(seconds: int) -> str:
+    """Formate une durée en secondes en chaîne lisible (ex: 1h 23m, 12m, 45s)."""
+    if seconds is None or seconds <= 0:
+        return ""
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    parts = []
+    if h:
+        parts.append(f"{h}h")
+    if m:
+        parts.append(f"{m}m")
+    if not parts and s:
+        parts.append(f"{s}s")
+    return " ".join(parts)
+
+def format_commit(date_obj, commit_hash, message, duration_seconds):
+    """Formate un commit pour Markdown avec la durée depuis le commit précédent."""
+    dur = format_duration(duration_seconds)
+    suffix = f" (Δ {dur})" if dur else ""
+    return f"- **{date_obj}** [`{commit_hash}`]{suffix} : {message}"
 
 def main():
     lines = get_git_log()
@@ -45,15 +68,21 @@ def main():
     # Regroupement par année/semaine ISO
     for line in lines:
         parts = line.split("|")
-        if len(parts) < 3:
+        if len(parts) < 4:
             continue
-        date_str, commit_hash, message = parts
+        date_str, commit_hash, message, ts_str = parts
         try:
             date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+            ts = int(ts_str)
         except Exception:
             continue
         iso_year, iso_week, _ = date_obj.isocalendar()
-        commits_by_week[(iso_year, iso_week)].append((date_obj, commit_hash, message))
+        commits_by_week[(iso_year, iso_week)].append({
+            "date": date_obj,
+            "hash": commit_hash,
+            "message": message,
+            "ts": ts,
+        })
     
     # Tri des semaines par ordre décroissant
     sorted_weeks = sorted(commits_by_week.keys(), reverse=True)
@@ -70,10 +99,27 @@ def main():
         header = f"## Semaine {week} ({start} → {end}, {year})"
         output.append(header)
         output.append("")
-        # Tri des commits par date décroissante
-        commits = sorted(commits_by_week[(year, week)], key=lambda x: x[0], reverse=True)
-        for commit in commits:
-            output.append(format_commit(*commit))
+        # Calcul des durées par commit (diff avec le commit précédent, tri ascendant par temps)
+        week_commits = commits_by_week[(year, week)]
+        ordered_by_time = sorted(week_commits, key=lambda c: c["ts"])  # plus ancien → plus récent
+        durations = {}
+        prev_ts = None
+        for c in ordered_by_time:
+            cur_ts = c["ts"]
+            durations[c["hash"]] = (cur_ts - prev_ts) if prev_ts is not None else None
+            prev_ts = cur_ts
+
+        # Rendu en date décroissante (comme avant)
+        commits = sorted(week_commits, key=lambda x: (x["date"], x["ts"]), reverse=True)
+        for c in commits:
+            output.append(
+                format_commit(
+                    c["date"],
+                    c["hash"],
+                    c["message"],
+                    durations.get(c["hash"]) if durations else None,
+                )
+            )
         output.append("")  # Ligne vide pour séparer les semaines
         output.append("---")  # Séparateur visuel entre les semaines
         output.append("")
