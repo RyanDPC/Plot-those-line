@@ -5,20 +5,48 @@ date: "Lausanne, Vennes – 32p "
 project_manager: "Melly Jonathan"
 ---
 
-<p align="center" style="font-size:22px; font-weight:bold;">
-ETML Informatique
-</p>
-
----
-
-# Rapport de Projet
-
-_Auteur : Nom – Classe_  
-_Lieu – Durée_  
-_Chef de projet : Nom_  
-_Mandant : Nom et adresse_
-
----
+<div style="background-color: #000000; color: #ffffff; text-align: center; padding: 30px; font-family: Arial, sans-serif;">
+<div style="background-color: #000000; color: #ffffff; padding: 20px; margin: 20px; border-radius: 8px;">
+</div>
+<div>
+<h2 style="font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 1px; color: #ffffff;">
+RAPPORT DE PROJET
+</h2>
+</div>
+</div>
+<div style="background-color: #000000; color: #ffffff; padding: 25px; margin: 0; border-radius: 0; text-align: center;">
+<table style="margin: 0 auto; border-collapse: collapse; width: 100%; max-width: 500px; background-color: #000000;">
+<tr style="background-color: #333333;">
+<th style="padding: 12px; text-align: left; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Information</th>
+<th style="padding: 12px; text-align: left; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Détail</th>
+</tr>
+<tr style="background-color: #000000;">
+<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Auteur</td>
+<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">De Pina Correia Ryan – CID3A</td>
+</tr>
+<tr style="background-color: #222222;">
+<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Lieu – Durée</td>
+<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">Lausanne, Vennes – 32p</td>
+</tr>
+<tr style="background-color: #000000;">
+<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Chef de projet</td>
+<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">Melly Jonathan</td>
+</tr>
+<tr style="background-color: #222222;">
+<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Mandant</td>
+<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">ETML - École Technique des Métiers de Lausanne</td>
+</tr>
+</table>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0;">
+<div style="font-size: 16px; font-weight: bold; color: #ffffff; letter-spacing: 3px; font-family: ETML, sans-serif; margin: 0;">
+ETML
+</div>
+<div style="font-size: 16px; color: #ffffff; font-style: italic; font-family: cursive;">
+<img src="../../script/docs/image.png" alt="Logo ETML" style="height: 40px; margin: 0 20px;">
+</div>
+</div>
+<div style="width: 100%; height: 2px; background-color: #ffffff;"></div>
 
 # Table des matières
 - [1. Spécifications](#1-spécifications)
@@ -46,9 +74,9 @@ _Mandant : Nom et adresse_
 
 ---
 
-# 1. Spécifications
+<h1 style="color: #ffffff; background-color: #000000; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
 
-## 1.1 Plot-Those-Line 
+<h2 style="color: #ffffff; background-color: #000000; padding: 8px 0; margin: 15px 0;">1.1 Plot-Those-Line</h2> 
 ### Description
 Concevoir un logiciel permettant d’afficher et d’analyser des séries temporelles sous forme graphique.  
 L’utilisateur pourra importer des données externes (CSV, JSON, API) et comparer plusieurs jeux de données simultanément.  
@@ -248,3 +276,5 @@ _A compléter_
 
 # 8. Annexes  
 _A compléter_
+
+</div>
