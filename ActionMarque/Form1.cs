@@ -1,11 +1,13 @@
-﻿using System;
+﻿using static System.Collections.Specialized.BitVector32;
+using System.Security.Cryptography;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Drawing.Drawing2D;
 
 namespace ActionMarque
 {
@@ -13,18 +15,30 @@ namespace ActionMarque
     {
         private Chart chart;
         private Panel rightPanel;
-        // Labels de statistiques supprimés pour design simplifié
         private Panel brandListPanel;
         private TextBox txtValues;
         private Button btnAdd;
         private Button btnDelete;
-        private List<Color> colorPalette = new List<Color> { Color.DodgerBlue, Color.Orange, Color.LimeGreen, Color.Gold, Color.Violet, Color.Tomato, Color.Cyan, Color.Silver, Color.Khaki, Color.Magenta };
+        private ComboBox cmbSort;
+        private Label lblStats;
+        private Button btnFilter;
+
+        private List<Color> colorPalette = new List<Color>
+        {
+            Color.DodgerBlue, Color.Orange, Color.LimeGreen, Color.Gold,
+            Color.Violet, Color.Tomato, Color.Cyan, Color.Silver,
+            Color.Khaki, Color.Magenta
+        };
         private int colorIndex = 0;
         private const int baseYear = 2019;
         private bool suppressItemCheckEvents = false;
+
         private List<BrandItem> brands = new List<BrandItem>();
-        private AlphaVantageService apiService;
-        private const string API_KEY = "5D-P4JJKCO-K378T";
+        private TwelveDataService apiService;
+        private const string API_KEY = "6ae579e4a04d419088432ae3bbe455ee";
+
+        // dictionnaire FullName -> Abbreviation (ticker)
+        private Dictionary<string, string> brandMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         private class BrandItem
         {
@@ -33,14 +47,39 @@ namespace ActionMarque
             public bool IsVisible { get; set; } = true;
             public double[] Values { get; set; }
             public Color Color { get; set; }
-            public string Status { get; set; } = "neutral"; // positive, negative, neutral
-            public override string ToString() => DisplayText;
+            public string Status { get; set; } = "neutral";
+            public override string ToString() => DisplayText ?? Name;
         }
 
         public Form1()
         {
-            apiService = new AlphaVantageService(API_KEY);
+            apiService = new TwelveDataService(API_KEY);
             SetupUI();
+            LoadBrandDictionary("marques.txt");
+        }
+
+        private void LoadBrandDictionary(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show($"Le fichier {filePath} est introuvable. Le dictionnaire est vide.");
+                return;
+            }
+
+            foreach (var line in File.ReadAllLines(filePath))
+            {
+                if (string.IsNullOrWhiteSpace(line) || !line.Contains("="))
+                    continue;
+
+                var parts = line.Split('=');
+                if (parts.Length == 2)
+                {
+                    string fullName = parts[0].Trim();
+                    string symbol = parts[1].Trim();
+                    if (!brandMap.ContainsKey(fullName))
+                        brandMap[fullName] = symbol;
+                }
+            }
         }
 
         private void SetupUI()
@@ -50,56 +89,41 @@ namespace ActionMarque
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.Black;
 
-            var mainPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.Black
-            };
+            var mainPanel = new Panel { Dock = DockStyle.Fill, BackColor = Color.Black };
             this.Controls.Add(mainPanel);
 
-            // Ajouter d'abord le panneau de droite
             rightPanel = new Panel
             {
-                Dock = DockStyle.Right, // Dock à droite au lieu de Fill
-                Width = 300, // Largeur fixe
+                Dock = DockStyle.Right,
+                Width = 300,
                 BackColor = Color.FromArgb(40, 40, 40),
                 Padding = new Padding(15),
                 Visible = true
             };
             mainPanel.Controls.Add(rightPanel);
 
-            // Puis le panneau de gauche
             var leftPanel = new Panel
             {
-                Dock = DockStyle.Fill, // Fill pour prendre l'espace restant
+                Dock = DockStyle.Fill,
                 BackColor = Color.Black,
                 Padding = new Padding(20)
             };
             mainPanel.Controls.Add(leftPanel);
-            
-            System.Diagnostics.Debug.WriteLine($"RightPanel créé. Size: {rightPanel.Size}, location: {rightPanel.Location}");
 
             SetupChart(leftPanel);
             SetupControls();
-
             LoadData();
         }
 
         private void SetupChart(Panel parent)
         {
-            chart = new Chart
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.Black
-            };
-
+            chart = new Chart { Dock = DockStyle.Fill, BackColor = Color.Black };
             var chartArea = new ChartArea("main")
             {
                 BackColor = Color.Black,
                 BorderColor = Color.White,
                 BorderWidth = 1
             };
-
             chartArea.AxisX.MajorGrid.Enabled = false;
             chartArea.AxisX.LabelStyle.ForeColor = Color.White;
             chartArea.AxisX.LineColor = Color.White;
@@ -117,6 +141,20 @@ namespace ActionMarque
             chartArea.AxisY.LabelStyle.Format = "#,0";
 
             chart.ChartAreas.Add(chartArea);
+
+            lblStats = new Label
+            {
+                Dock = DockStyle.Bottom,
+                Height = 30,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(20, 20, 20),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Padding = new Padding(10, 0, 0, 0),
+                Text = ""
+            };
+            parent.Controls.Add(lblStats);
+            parent.Controls.SetChildIndex(lblStats, 0);
 
             var legend = new Legend
             {
@@ -141,7 +179,6 @@ namespace ActionMarque
         {
             int yPos = 30;
 
-            // Titre minimaliste
             var titleLabel = new Label
             {
                 Text = "Marques",
@@ -151,26 +188,40 @@ namespace ActionMarque
                 AutoSize = true
             };
             rightPanel.Controls.Add(titleLabel);
-            
+
             yPos += 60;
-            
-            // Bouton d'ajout minimaliste
+
             btnAdd = new Button
             {
-                Text = "+",
+                Text = File.Exists("add.png") ? "" : "+",
                 Location = new Point(20, yPos),
                 Size = new Size(40, 40),
                 BackColor = Color.FromArgb(0, 120, 215),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                BackgroundImageLayout = ImageLayout.Stretch
             };
+            if (File.Exists("add.png"))
+                btnAdd.BackgroundImage = Image.FromFile("add.png");
             btnAdd.Click += BtnAdd_Click;
             rightPanel.Controls.Add(btnAdd);
-            
+
+            // Filter button (image)
+            btnFilter = new Button
+            {
+                Size = new Size(40, 40),
+                Location = new Point(70, yPos),
+                BackgroundImageLayout = ImageLayout.Stretch,
+                Cursor = Cursors.Hand
+            };
+            if (File.Exists("filter.png"))
+                btnFilter.BackgroundImage = Image.FromFile("filter.png");
+            rightPanel.Controls.Add(btnFilter);
+
             yPos += 70;
-            
+
             brandListPanel = new Panel
             {
                 Location = new Point(20, yPos),
@@ -179,10 +230,23 @@ namespace ActionMarque
                 AutoScroll = true
             };
             rightPanel.Controls.Add(brandListPanel);
-            
+
             yPos += 320;
-            
-            // Section d'ajout ultra simple
+
+            // Sorting ComboBox
+            cmbSort = new ComboBox
+            {
+                Location = new Point(20, yPos),
+                Size = new Size(120, 25),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            cmbSort.Items.AddRange(new[] { "A → Z", "Z → A", "Montante", "Chute" });
+            cmbSort.SelectedIndex = 0;
+            cmbSort.SelectedIndexChanged += (s, e) => RefreshBrandList();
+            rightPanel.Controls.Add(cmbSort);
+
+            yPos += 40;
+
             var addSection = new Panel
             {
                 Location = new Point(20, yPos),
@@ -191,8 +255,7 @@ namespace ActionMarque
                 BorderStyle = BorderStyle.None
             };
             rightPanel.Controls.Add(addSection);
-            
-            // Champ symbole simple
+
             var lblValues = new Label
             {
                 Text = "Symbole",
@@ -202,7 +265,7 @@ namespace ActionMarque
                 AutoSize = true
             };
             addSection.Controls.Add(lblValues);
-            
+
             txtValues = new TextBox
             {
                 Location = new Point(10, 30),
@@ -215,6 +278,7 @@ namespace ActionMarque
                 Visible = false,
             };
             addSection.Controls.Add(txtValues);
+
             txtValues.KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.Enter)
@@ -228,36 +292,23 @@ namespace ActionMarque
                     }
                 }
             };
-            // Bouton supprimer simple
+
             btnDelete = new Button
             {
-                Text = "×",
+                Text = File.Exists("remove.png") ? "" : "×",
                 Location = new Point(140, 30),
                 Size = new Size(30, 25),
                 BackColor = Color.FromArgb(215, 58, 73),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                BackgroundImageLayout = ImageLayout.Stretch
             };
-           
+            if (File.Exists("remove.png"))
+                btnDelete.BackgroundImage = Image.FromFile("remove.png");
             btnDelete.Click += BtnDelete_Click;
             addSection.Controls.Add(btnDelete);
-        }
-
-        private Button CreateIconButton(string text, Point location, Color backColor)
-        {
-            return new Button
-            {
-                Text = text,
-                Location = location,
-                Size = new Size(25, 25),
-                BackColor = backColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Arial", 10, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
         }
 
         private async void LoadData()
@@ -265,7 +316,6 @@ namespace ActionMarque
             brands.Clear();
             brandListPanel.Controls.Clear();
 
-            // Afficher un message de chargement
             var loadingLabel = new Label
             {
                 Text = "Chargement des données...",
@@ -279,9 +329,7 @@ namespace ActionMarque
             try
             {
                 suppressItemCheckEvents = true;
-                
-                // Charger les données depuis l'API
-                var symbols = new[] { "AAPL" }; // Apple, Tesla, Nike
+                var symbols = brandMap.Values.ToArray();
                 var brandData = await apiService.GetMultipleStocksDataAsync(symbols);
 
                 if (brandData.Count > 0)
@@ -291,7 +339,8 @@ namespace ActionMarque
                         if (data.DataPoints.Count > 0)
                         {
                             var prices = data.DataPoints.Select(dp => dp.Price).ToArray();
-                            AddBrandSeries(data.Name, prices);
+                            string displayName = brandMap.FirstOrDefault(x => x.Value == data.Name).Key ?? data.Name;
+                            AddBrandSeries(displayName, prices);
                         }
                     }
                 }
@@ -301,12 +350,10 @@ namespace ActionMarque
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Erreur API: {ex.Message}");
-                
                 RefreshBrandList();
             }
             finally
             {
-                // Supprimer le message de chargement
                 brandListPanel.Controls.Remove(loadingLabel);
             }
         }
@@ -336,24 +383,19 @@ namespace ActionMarque
             }
             chart.Series.Add(s);
 
-            // Créer l'item de marque
             var status = ComputeStatus(values);
-            var brandItem = new BrandItem 
-            { 
-                Name = name, 
+            var brandItem = new BrandItem
+            {
+                Name = name,
                 Values = values,
                 Color = seriesColor,
                 Status = status,
-                IsVisible = true
+                IsVisible = true,
+                DisplayText = name
             };
-            
-            RemoveBrandItemIfExists(name);
-            brands.Add(brandItem);
-        }
 
-        private void RemoveBrandItemIfExists(string name)
-        {
             brands.RemoveAll(b => b.Name == name);
+            brands.Add(brandItem);
         }
 
         private static string ComputeStatus(IReadOnlyList<double> values)
@@ -368,9 +410,28 @@ namespace ActionMarque
         private void RefreshBrandList()
         {
             brandListPanel.Controls.Clear();
-            
+
+            IEnumerable<BrandItem> sorted = brands;
+            string selectedSort = cmbSort.SelectedItem?.ToString() ?? "A → Z";
+
+            switch (selectedSort)
+            {
+                case "A → Z":
+                    sorted = brands.OrderBy(b => b.Name);
+                    break;
+                case "Z → A":
+                    sorted = brands.OrderByDescending(b => b.Name);
+                    break;
+                case "Montante":
+                    sorted = brands.OrderByDescending(b => b.Values.Last() - b.Values.First());
+                    break;
+                case "Chute":
+                    sorted = brands.OrderBy(b => b.Values.Last() - b.Values.First());
+                    break;
+            }
+
             int yPos = 10;
-            foreach (var brand in brands)
+            foreach (var brand in sorted)
             {
                 var brandPanel = CreateBrandItemPanel(brand, yPos);
                 brandListPanel.Controls.Add(brandPanel);
@@ -389,7 +450,6 @@ namespace ActionMarque
                 Cursor = Cursors.Hand
             };
 
-            // Cercle de statut ultra simple
             var statusCircle = new Panel
             {
                 Location = new Point(10, 14),
@@ -399,7 +459,6 @@ namespace ActionMarque
             };
             panel.Controls.Add(statusCircle);
 
-            // Nom de la marque simple
             var nameLabel = new Label
             {
                 Text = brand.Name,
@@ -411,7 +470,6 @@ namespace ActionMarque
             };
             panel.Controls.Add(nameLabel);
 
-            // Checkbox simple
             var checkBox = new CheckBox
             {
                 Location = new Point(200, 10),
@@ -423,28 +481,22 @@ namespace ActionMarque
             checkBox.CheckedChanged += (s, e) => ToggleBrandVisibility(brand, checkBox.Checked);
             panel.Controls.Add(checkBox);
 
-            // Clic pour sélectionner
             panel.Click += (s, e) => SelectBrand(brand);
             nameLabel.Click += (s, e) => SelectBrand(brand);
 
             return panel;
         }
 
-        private void DrawCircle(Graphics g, Rectangle rect, Color color)
-        {
-            using (var brush = new SolidBrush(color))
-            {
-                g.FillEllipse(brush, rect);
-            }
-        }
-
         private Color GetStatusColor(string status)
         {
             switch (status)
             {
-                case "positive": return Color.FromArgb(0, 200, 0);
-                case "negative": return Color.FromArgb(200, 0, 0);
-                default: return Color.FromArgb(150, 150, 150);
+                case "positive":
+                    return Color.FromArgb(0, 200, 0);
+                case "negative":
+                    return Color.FromArgb(200, 0, 0);
+                default:
+                    return Color.FromArgb(150, 150, 150);
             }
         }
 
@@ -457,12 +509,12 @@ namespace ActionMarque
                 series.Enabled = isVisible;
             }
         }
-
         private void SelectBrand(BrandItem brand)
         {
             txtValues.Visible = true;
             txtValues.Text = brand.Name;
             txtValues.Focus();
+            VleLine(brand.Name);
         }
 
         private async void BtnAdd_Click(object sender, EventArgs e)
@@ -472,49 +524,56 @@ namespace ActionMarque
             txtValues.Text = "";
             txtValues.BringToFront();
         }
-        private async void AddBrandFromTextBox(string symbole)
+
+        private async void AddBrandFromTextBox(string input)
         {
             try
             {
+                string symbole = input;
+                string displayName = input;
+
+                if (brandMap.ContainsKey(input))
+                {
+                    symbole = brandMap[input];
+                    displayName = input;
+                }
+
                 var data = await apiService.GetStockDataAsync(symbole);
                 if (data.Count > 0)
                 {
                     var prices = data.Select(dp => dp.Price).ToArray();
-                    AddBrandSeries(symbole, prices);
+                    AddBrandSeries(displayName, prices);
                 }
                 else
                 {
                     var parsed = ParseValues(txtValues.Text);
                     if (parsed.Length > 0)
-                        AddBrandSeries(symbole, parsed);
+                        AddBrandSeries(displayName, parsed);
                 }
 
                 RefreshBrandList();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des données pour {symbole}: {ex.Message}");
+                MessageBox.Show($"Erreur lors du chargement des données pour {input}: {ex.Message}");
             }
         }
 
-        private void BtnEdit_Click(object sender, EventArgs e)
+        private void VleLine(string line)
         {
-            var name = (txtValues.Text ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(name)) return;
-
-            var parsed = ParseValues(txtValues.Text);
-            if (parsed.Length == 0) return;
-
-            // Supprimer l'ancienne série
-            var existingSeries = chart.Series.FindByName(name);
-            if (existingSeries != null)
+            var series = chart.Series.FindByName(line);
+            if (series == null || series.Points.Count == 0)
             {
-                chart.Series.Remove(existingSeries);
+                lblStats.Text = "";
+                return;
             }
 
-            // Ajouter la nouvelle série
-            AddBrandSeries(name, parsed);
-            RefreshBrandList();
+            var values = series.Points.Select(p => p.YValues[0]).ToList();
+            double min = values.Min();
+            double max = values.Max();
+            double avg = values.Average();
+
+            lblStats.Text = $"Min: {min:F2}   Max: {max:F2}   Avg: {avg:F2}";
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
@@ -522,25 +581,16 @@ namespace ActionMarque
             var name = (txtValues.Text ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(name)) return;
 
-            // Supprimer de la liste des marques
             brands.RemoveAll(b => b.Name == name);
-            
-            // Supprimer du graphique
+
             var series = chart.Series.FindByName(name);
-            if (series != null) 
+            if (series != null)
             {
                 chart.Series.Remove(series);
             }
 
             RefreshBrandList();
-            
             txtValues.Text = "";
-            txtValues.Text = "100,120,140";
-        }
-
-        private async void BtnRefresh_Click(object sender, EventArgs e)
-        {
-            await Task.Run(() => LoadData());
         }
 
         private static double[] ParseValues(string input)
@@ -550,15 +600,13 @@ namespace ActionMarque
             var list = new List<double>();
             foreach (var p in parts)
             {
-                if (double.TryParse(p.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double v))
+                if (double.TryParse(p.Replace(',', '.'), System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture, out double v))
                 {
                     list.Add(v);
                 }
             }
             return list.ToArray();
         }
-
     }
 }
-
-

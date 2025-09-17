@@ -3,16 +3,19 @@
   "WorkspaceRootPath": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|c:\\users\\pa70iyc\\documents\\github\\plot-those-line\\actionmarque\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|c:\\users\\pa70iyc\\documents\\github\\plot-those-line\\actionmarque\\twelvedataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:twelvedataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\pa70iyc\\Documents\\marques.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\alphavantageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|solutionrelative:alphavantageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7B28E8F1-69BC-4739-B45D-11ADE4BDF185}|ActionMarque.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -26,49 +29,60 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "TwelveDataService.cs",
+              "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\TwelveDataService.cs",
+              "RelativeDocumentMoniker": "TwelveDataService.cs",
+              "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\TwelveDataService.cs",
+              "RelativeToolTip": "TwelveDataService.cs",
+              "ViewState": "AQIAABoAAAAAAAAAAAAmwCQAAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-17T13:16:39.076Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "marques.txt",
+              "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\marques.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\marques.txt",
+              "ToolTip": "C:\\Users\\pa70iyc\\Documents\\marques.txt",
+              "RelativeToolTip": "..\\..\\..\\marques.txt",
+              "ViewState": "AQIAABUAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-09-17T12:05:06.157Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Form1.cs [Design]",
               "RelativeToolTip": "Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-10T09:17:37.235Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-09-10T09:17:37.235Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "AlphaVantageService.cs",
-              "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\AlphaVantageService.cs",
-              "RelativeDocumentMoniker": "AlphaVantageService.cs",
-              "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\AlphaVantageService.cs",
-              "RelativeToolTip": "AlphaVantageService.cs",
-              "ViewState": "AQIAAAsAAAAAAAAAAAAQwC8AAAA6AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-10T09:04:30.112Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AQIAAOoAAAAAAAAAAAAiwBwBAAAvAAAA",
+              "ViewState": "AQIAADkCAAAAAAAAAAAqwEwCAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-03T13:16:05.733Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-03T13:16:05.733Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Plot-those-line\\ActionMarque\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -76,8 +90,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-03T13:10:48.817Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-03T13:10:48.817Z"
             }
           ]
         }
