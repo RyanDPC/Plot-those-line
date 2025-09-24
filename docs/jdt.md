@@ -3,6 +3,13 @@
 
 ---
 
+## Semaine 39 (2025-09-22 → 2025-09-28, 2025)
+
+- **2025-09-24** [`3e11949`] (Δ 1m) : Refactor series addition and UI layout in Form1.cs
+- **2025-09-24** [`06d25a4`] : Add zoom and filter features to chart UI
+
+---
+
 ## Semaine 38 (2025-09-15 → 2025-09-21, 2025)
 
 - **2025-09-17** [`475d560`] : Switch to TwelveData API and add brand dictionary support
