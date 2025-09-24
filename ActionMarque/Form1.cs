@@ -153,7 +153,7 @@ namespace ActionMarque
             chartArea.AxisY.Title = "Prix ($)";
             chartArea.AxisY.TitleForeColor = Color.White;
             chartArea.AxisY.LabelStyle.Format = "#,0";
-
+            
             // Définir les limites de l'axe X (copiée du test qui fonctionne)
             var minDate = new DateTime(2020, 9, 24);
             var maxDate = new DateTime(2025, 9, 23);
@@ -439,22 +439,22 @@ namespace ActionMarque
             var seriesColor = fixedColor ?? colorPalette[colorIndex++ % colorPalette.Count];
             
             try
+        {
+            var existing = chart.Series.FindByName(name);
+            if (existing != null)
             {
-                var existing = chart.Series.FindByName(name);
-                if (existing != null)
-                {
-                    chart.Series.Remove(existing);
-                }
+                chart.Series.Remove(existing);
+            }
                 
-                var s = new Series(name)
-                {
-                    ChartType = SeriesChartType.Line,
-                    BorderWidth = 3,
-                    Color = seriesColor,
-                    ChartArea = "main",
-                    XValueType = ChartValueType.DateTime,
-                    Enabled = true
-                };
+            var s = new Series(name)
+            {
+                ChartType = SeriesChartType.Line,
+                BorderWidth = 3,
+                Color = seriesColor,
+                ChartArea = "main",
+                XValueType = ChartValueType.DateTime,
+                Enabled = true
+            };
 
                 if (dataPoints != null && dataPoints.Count > 0)
                 {
@@ -470,16 +470,16 @@ namespace ActionMarque
                 else
                 {
                     // Fallback : utiliser les dates par défaut (années)
-                    for (int i = 0; i < values.Length; i++)
-                    {
+            for (int i = 0; i < values.Length; i++)
+            {
                         var pointDate = new DateTime(baseYear + i, 1, 1);
-                        s.Points.AddXY(pointDate, values[i]);
+                            s.Points.AddXY(pointDate, values[i]);
                     }
                     System.Diagnostics.Debug.WriteLine($"Série {name} ajoutée avec {s.Points.Count} points (dates par défaut)");
                 }
                 
                 // Ajouter la série
-                chart.Series.Add(s);
+            chart.Series.Add(s);
                 
                 // Forcer la mise à jour (copiée du test qui fonctionne)
                 chart.Invalidate();
@@ -622,7 +622,7 @@ namespace ActionMarque
             {
                 Text = brand.Name,
                 Location = new Point(25, 10),
-                Size = new Size(100, 20), // Ajuster à la nouvelle largeur
+                Size = new Size(80, 20), // Réduire la largeur pour faire place au checkbox
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 10),
                 BackColor = Color.Transparent
@@ -631,7 +631,7 @@ namespace ActionMarque
 
             var checkBox = new CheckBox
             {
-                Location = new Point(110, 10), // Ajuster à la nouvelle largeur
+                Location = new Point(110, 10), // Position à droite
                 Size = new Size(15, 15),
                 Checked = brand.IsVisible,
                 BackColor = Color.Transparent,
