@@ -1,17 +1,27 @@
 # Journal de Travail (JDT)
-*Généré le 2025-09-10*
+*Généré le 2025-09-24*
+
+---
+
+## Semaine 38 (2025-09-15 → 2025-09-21, 2025)
+
+- **2025-09-17** [`475d560`] : Switch to TwelveData API and add brand dictionary support
 
 ---
 
 ## Semaine 37 (2025-09-08 → 2025-09-14, 2025)
 
+- **2025-09-10** [`9b9b9d1`] (Δ 40m) : Enhance project report layout and remove PDF export script
+- **2025-09-10** [`b845719`] (Δ 1h 50m) : Add PDF export scripts and update project report
+- **2025-09-10** [`0513714`] (Δ 39m) : feat(): Create add Button, delet Button and the logic (not tested)
+- **2025-09-10** [`ad41fd6`] (Δ 12h 38m) : fix(): add a line for know, how many hours i make for a commit
 - **2025-09-10** [`2e9d6ea`] : Replace Form3 with Form1 and add AlphaVantage API integration
 
 ---
 
 ## Semaine 36 (2025-09-01 → 2025-09-07, 2025)
 
-- **2025-09-07** [`7811bc7`] (Δ 1h 12m) : Remove old forms and API code, add Form3
+- **2025-09-07** [`7811bc7`] (Δ 101h 12m) : Remove old forms and API code, add Form3
 - **2025-09-03** [`becb235`] (Δ 8m) : feat: Graphics with Alpha
 - **2025-09-03** [`713b90b`] (Δ 1h 49m) : feat(): try to make two Graphics : one with Alpha Vantage, another with Marketstack
 - **2025-09-03** [`af3475e`] (Δ 13m) : feat(): api client for taking the action by society

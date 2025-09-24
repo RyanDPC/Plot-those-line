@@ -11,32 +11,10 @@ project_manager: "Melly Jonathan"
 <div>
 <h2 style="font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 1px; color: #ffffff;">
 RAPPORT DE PROJET
+
+Plot-Those-Line
 </h2>
 </div>
-</div>
-<div style="background-color: #000000; color: #ffffff; padding: 25px; margin: 0; border-radius: 0; text-align: center;">
-<table style="margin: 0 auto; border-collapse: collapse; width: 100%; max-width: 500px; background-color: #000000;">
-<tr style="background-color: #333333;">
-<th style="padding: 12px; text-align: left; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Information</th>
-<th style="padding: 12px; text-align: left; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Détail</th>
-</tr>
-<tr style="background-color: #000000;">
-<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Auteur</td>
-<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">De Pina Correia Ryan – CID3A</td>
-</tr>
-<tr style="background-color: #222222;">
-<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Lieu – Durée</td>
-<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">Lausanne, Vennes – 32p</td>
-</tr>
-<tr style="background-color: #000000;">
-<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Chef de projet</td>
-<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">Melly Jonathan</td>
-</tr>
-<tr style="background-color: #222222;">
-<td style="padding: 12px; border: 1px solid #ffffff; font-weight: bold; color: #ffffff;">Mandant</td>
-<td style="padding: 12px; border: 1px solid #ffffff; color: #ffffff;">ETML - École Technique des Métiers de Lausanne</td>
-</tr>
-</table>
 </div>
 <div style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0;">
 <div style="font-size: 16px; font-weight: bold; color: #ffffff; letter-spacing: 3px; font-family: ETML, sans-serif; margin: 0;">
@@ -46,7 +24,7 @@ ETML
 <img src="../../script/docs/image.png" alt="Logo ETML" style="height: 40px; margin: 0 20px;">
 </div>
 </div>
-<div style="width: 100%; height: 2px; background-color: #ffffff;"></div>
+<div style="width: 100%; height: 2px; margin-top: -20px; background-color: #ffffff;"></div>
 
 # Table des matières
 - [1. Spécifications](#1-spécifications)
@@ -76,7 +54,7 @@ ETML
 
 <h1 style="color: #ffffff; background-color: #000000; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
 
-<h2 style="color: #ffffff; background-color: #000000; padding: 8px 0; margin: 15px 0;">1.1 Plot-Those-Line</h2> 
+<h2 style="color: #ffffff; background-color: #000000; padding: 8px 0; margin: 15px 0;">1.1 Introduction</h2> 
 ### Description
 Concevoir un logiciel permettant d’afficher et d’analyser des séries temporelles sous forme graphique.  
 L’utilisateur pourra importer des données externes (CSV, JSON, API) et comparer plusieurs jeux de données simultanément.  
@@ -209,30 +187,130 @@ Dans tous les cas, les points suivants doivent être respectés :
 ---
 
 # 2. Planification Initiale  
-_A compléter_
+
+## 2.1 Méthodologie de projet
+- **Approche :** Développement par itérations avec User Stories
+- **Outils de gestion :** 
+  - **GitHub Project :** [Project #4](https://github.com/users/RyanDPC/projects/4) 
+  - **Repository :** [Plot-those-line](https://github.com/RyanDPC/Plot-those-line)
+  - **Issues & Roadmap :** Suivi des tâches et bugs
+- **Durée totale :** 32 périodes
+- **Suivi :** Journal de travail détaillé → [📋 Consulter le JDT](../jdt.md)
+
+## 2.4 Suivi et contrôle
+- **GitHub Project Board :** [Tableau de bord Project #4](https://github.com/users/RyanDPC/projects/4)
+  - 📋 **Backlog** : User Stories en attente
+  - 🔄 **In Progress** : Tâches en cours de développement  
+  - ✅ **Done** : Fonctionnalités terminées et testées
+- **Journal de travail quotidien :** [📋 JDT détaillé](../jdt.md)
+- **Issues GitHub :** Suivi des bugs et améliorations
+- **Commits réguliers :** Messages explicites et atomiques
+- **Points réguliers** avec le chef de projet
 
 ---
 
 # 3. Analyse
 
-## 3.1 Opportunités  
-_A compléter_
+## 3.1 Explication API
 
-## 3.2 Document d’analyse et conception  
-_A compléter_
+### Twelve Data
+
+Cette API n'était pas la première api que j'ai utilisé, au début du projet j'avais utilisé l'API Alpha Vantage mais le soucis, c'est que pour une Api gratuite elle me fournissait que 25 requête par jour.
+Le soucis c'est que dès que je testais 3 - 4 fois mon graphique por savoir si tout s'affichait je ne pouvais plus rien utiliser. Après un moment de recherche j'ai trouvé cette api qui me fournit les données voulues et parfaitement bien.
+Elle me laisse + de liberté et me laisse plus de requête et j'ai une meilleur vision de ce que je peux utiliser par jour via leur interface web + complète.
+
+---
+
+## 3.2 Gestion de l'API
+
+### Structure de réponse Twelve Data
+
+L'API Twelve Data retourne les données au format JSON avec la structure suivante :
+
+```json
+{
+  "meta": {
+    "symbol": "TSLA",              // Nom de la marque (abréviation)
+    "interval": "1day",            // Données par jour
+    "currency": "USD",             // Monnaie utilisée
+    "exchange_timezone": "America/New_York",
+    "exchange": "NASDAQ",
+    "mic_code": "XNGS",
+    "type": "Common Stock"
+  },
+  "values": [
+    {
+      "datetime": "2025-09-23",    // Date de l'ouverture 
+      "open": "439.88000",         // Prix à l'ouverture des actions 
+      "high": "440.97000",         // Le plus haut dans la journée
+      "low": "423.72000",          // Le plus bas dans la journée
+      "close": "425.85001",        // Prix à la fermeture des actions
+      "volume": "83211500"         // Nombre d'actions échangées
+    },
+    {
+      "datetime": "2025-09-22",
+      "open": "431.10999",
+      "high": "444.98001",
+      "low": "429.13000",
+      "close": "434.20999",
+      "volume": "97108800"
+    }
+  ],
+  "status": "ok"                   // Statut de la requête
+}
+```
+### Utilisation dans Plot-Those-Line
+
+Ces données Twelve Data sont ensuite traitées pour générer les graphiques :
+
+- **High/Low** : Pour visualiser la volatilité (Average = Moyenne)
+- **DateTime** : Axe temporel (X) du graphique
+
+---
 
 ## 3.3 Conception des tests  
 _A compléter_
 
-## 3.4 Planification détaillée  
+## 3.4 Affichage graphique (Code) 
 _A compléter_
 
 ---
 
-# 4. Réalisation
+## 4.1 Dossier de réalisation
 
-## 4.1 Dossier de réalisation  
-_A compléter_
+### 4.1.1 Architecture du projet
+
+**Repository GitHub :** [RyanDPC/Plot-those-line](https://github.com/RyanDPC/Plot-those-line)
+
+**Structure des fichiers :**
+Plot-those-line/
+├── ActionMarque/ # Application principale C#
+│ ├── TwelveDataService.cs # Service API Twelve Data
+│ ├── Form1.cs # Interface utilisateur
+│ ├── AlphaVantageService.cs # Service API alternatif
+│ └── ActionMarque.csproj # Configuration projet
+├── docs/ # Documentation
+│ ├── jdt.md # Journal de travail
+│ └── Livrables/rapport.md # Rapport de projet
+└── script/ # Scripts d'automatisation
+├── generate-jdt.py # Génération JDT automatique
+└── export-rapport.bat # Export PDF du rapport
+
+
+### 4.1.2 Fonctionnalités implémentées
+
+**Suivi détaillé :** [GitHub Project Board](https://github.com/users/RyanDPC/projects/4)
+
+| Fonctionnalité | Statut | Commit | Issue |
+|----------------|--------|--------|-------|
+| **Service Twelve Data API** | ✅ Terminé | `TwelveDataService.cs` | - |
+| **Interface graphique** | ✅ Terminé | `Form1.cs` | - |
+| **Gestion multi-granularité** | ✅ Terminé | Enum `DataGranularity` | - |
+| **Filtrage par dates** | ✅ Terminé | Période 2020-2025 | - |
+| **Parsing JSON robuste** | ✅ Terminé | Gestion erreurs | - |
+| **Documentation automatisée** | ✅ Terminé | Scripts Python/Batch | - |
+
+---
 
 ## 4.2 Modifications  
 _A compléter_
@@ -255,26 +333,13 @@ _A compléter_
 _A compléter_
 
 ## 6.3 Bilan personnel  
-_A compléter_
+
+J'ai particulièrement apprécié la réalisation de ce rapport car cela m'a permis de créer un template réutilisable pour mes futurs projets GitHub. Cette approche de documentation structurée me sera très utile pour organiser mes travaux. Concernant la partie développement, j'ai constaté que l'utilisation d'une API avec C# présente certaines difficultés pour moi. Je trouve que la visualisation et la compréhension du code sont plus complexes dans ce langage comparé à d'autres frameworks que j'ai pu utiliser. L'utilisation de Visual Studio 2022 a également représenté un défi supplémentaire. N'étant pas familier avec cet environnement de développement, je l'ai trouvé moins intuitif que d'autres IDE que j'utilise habituellement. Néanmoins, cette expérience m'a permis de découvrir un nouvel outil professionnel et de sortir de ma zone de confort technologique, ce qui enrichit mon profil de développeur.
 
 ---
 
 # 7. Divers
 
 ## 7.1 Journal de travail  
-_A compléter_
-
-## 7.2 Bibliographie  
-- Auteur, *Titre*, Édition, Année.  
-- ...
-
-## 7.3 Webographie  
-- [Nom du site](https://) – Description  
-- ...
-
----
-
-# 8. Annexes  
-_A compléter_
-
+- **Suivi :** Journal de travail détaillé → [📋 Consulter le JDT](../jdt.md)
 </div>
