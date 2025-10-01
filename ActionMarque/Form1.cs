@@ -100,9 +100,9 @@ namespace ActionMarque
             rightPanel = new Panel
             {
                 Dock = DockStyle.Right,
-                Width = 180, // Réduire encore plus la largeur pour laisser plus de place au graphique
-                BackColor = Color.FromArgb(40, 40, 40),
-                Padding = new Padding(8), // Réduire encore plus le padding
+                Width = 200, // Largeur légèrement augmentée pour un meilleur espacement
+                BackColor = Color.FromArgb(28, 28, 30), // Couleur plus moderne (gris foncé)
+                Padding = new Padding(12),
                 Visible = true
             };
             mainPanel.Controls.Add(rightPanel);
@@ -213,32 +213,35 @@ namespace ActionMarque
 
         private void SetupControls()
         {
-            int yPos = 30;
+            int yPos = 20;
 
             var titleLabel = new Label
             {
-                Text = "Marques",
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                Location = new Point(20, yPos),
+                Text = "MARQUES",
+                ForeColor = Color.FromArgb(0, 122, 255), // Bleu moderne
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Location = new Point(15, yPos),
                 AutoSize = true
             };
             rightPanel.Controls.Add(titleLabel);
 
-            yPos += 60;
+            yPos += 45;
 
             btnAdd = new Button
             {
                 Text = File.Exists("add.png") ? "" : "+",
-                Location = new Point(20, yPos),
-                Size = new Size(40, 40),
-                BackColor = Color.FromArgb(0, 120, 215),
+                Location = new Point(15, yPos),
+                Size = new Size(42, 42),
+                BackColor = Color.FromArgb(0, 122, 255),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 Cursor = Cursors.Hand,
                 BackgroundImageLayout = ImageLayout.Stretch
             };
+            btnAdd.FlatAppearance.BorderSize = 0;
+            btnAdd.FlatAppearance.MouseOverBackColor = Color.FromArgb(10, 132, 255);
+            btnAdd.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 102, 204);
             if (File.Exists("add.png"))
                 btnAdd.BackgroundImage = Image.FromFile("add.png");
             btnAdd.Click += BtnAdd_Click;
@@ -247,11 +250,16 @@ namespace ActionMarque
             // Filter button (image)
             btnFilter = new Button
             {
-                Size = new Size(40, 40),
-                Location = new Point(70, yPos),
+                Size = new Size(42, 42),
+                Location = new Point(65, yPos),
                 BackgroundImageLayout = ImageLayout.Stretch,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                BackColor = Color.FromArgb(52, 52, 54),
+                FlatStyle = FlatStyle.Flat
             };
+            btnFilter.FlatAppearance.BorderSize = 0;
+            btnFilter.FlatAppearance.MouseOverBackColor = Color.FromArgb(72, 72, 74);
+            btnFilter.FlatAppearance.MouseDownBackColor = Color.FromArgb(42, 42, 44);
             if (File.Exists("filter.png"))
                 btnFilter.BackgroundImage = Image.FromFile("filter.png");
             btnFilter.Click += BtnFilter_Click;
@@ -261,14 +269,17 @@ namespace ActionMarque
             var btnResetZoom = new Button
             {
                 Text = "🔍",
-                Size = new Size(40, 40),
-                Location = new Point(120, yPos),
-                BackColor = Color.FromArgb(60, 60, 60),
+                Size = new Size(42, 42),
+                Location = new Point(115, yPos),
+                BackColor = Color.FromArgb(52, 52, 54),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new Font("Segoe UI", 14, FontStyle.Regular),
                 Cursor = Cursors.Hand
             };
+            btnResetZoom.FlatAppearance.BorderSize = 0;
+            btnResetZoom.FlatAppearance.MouseOverBackColor = Color.FromArgb(72, 72, 74);
+            btnResetZoom.FlatAppearance.MouseDownBackColor = Color.FromArgb(42, 42, 44);
             btnResetZoom.Click += (s, e) => ResetZoom();
             rightPanel.Controls.Add(btnResetZoom);
             
@@ -281,23 +292,24 @@ namespace ActionMarque
             // Label pour afficher le niveau de zoom actuel
             var lblGranularity = new Label
             {
-                Text = "Zoom: 1.0x (Vue complète)",
-                Location = new Point(20, yPos),
-                Size = new Size(260, 20),
-                ForeColor = Color.LightGray,
-                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                Text = "Vue complète",
+                Location = new Point(15, yPos),
+                Size = new Size(170, 18),
+                ForeColor = Color.FromArgb(142, 142, 147),
+                Font = new Font("Segoe UI", 8, FontStyle.Regular),
                 Name = "lblGranularity"
             };
             rightPanel.Controls.Add(lblGranularity);
 
-            yPos += 30;
+            yPos += 25;
 
             brandListPanel = new Panel
             {
-                Location = new Point(8, yPos), // Ajuster la position
-                Size = new Size(160, 360), // Augmenter la hauteur pour compenser la suppression du tri
-                BackColor = Color.Transparent,
-                AutoScroll = true
+                Location = new Point(10, yPos),
+                Size = new Size(178, 380), // Augmenter la hauteur
+                BackColor = Color.FromArgb(44, 44, 46), // Fond légèrement plus clair que le panel parent
+                AutoScroll = true,
+                BorderStyle = BorderStyle.None
             };
             rightPanel.Controls.Add(brandListPanel);
 
@@ -305,19 +317,19 @@ namespace ActionMarque
 
             var addSection = new Panel
             {
-                Location = new Point(8, yPos), // Ajuster la position
-                Size = new Size(160, 100), // Ajuster à la nouvelle largeur
-                BackColor = Color.FromArgb(20, 20, 20),
+                Location = new Point(10, yPos),
+                Size = new Size(178, 90),
+                BackColor = Color.FromArgb(44, 44, 46),
                 BorderStyle = BorderStyle.None
             };
             rightPanel.Controls.Add(addSection);
 
             var lblValues = new Label
             {
-                Text = "Symbole",
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10),
-                Location = new Point(10, 10),
+                Text = "Symbole boursier",
+                ForeColor = Color.FromArgb(142, 142, 147),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Location = new Point(10, 8),
                 AutoSize = true
             };
             addSection.Controls.Add(lblValues);
@@ -325,8 +337,8 @@ namespace ActionMarque
             txtValues = new TextBox
             {
                 Location = new Point(10, 30),
-                Size = new Size(120, 25),
-                BackColor = Color.FromArgb(40, 40, 40),
+                Size = new Size(130, 28),
+                BackColor = Color.FromArgb(58, 58, 60),
                 ForeColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
                 Font = new Font("Segoe UI", 10),
@@ -352,15 +364,18 @@ namespace ActionMarque
             btnDelete = new Button
             {
                 Text = File.Exists("remove.png") ? "" : "×",
-                Location = new Point(140, 30),
-                Size = new Size(30, 25),
-                BackColor = Color.FromArgb(215, 58, 73),
+                Location = new Point(145, 30),
+                Size = new Size(28, 28),
+                BackColor = Color.FromArgb(255, 59, 48),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 Cursor = Cursors.Hand,
                 BackgroundImageLayout = ImageLayout.Stretch
             };
+            btnDelete.FlatAppearance.BorderSize = 0;
+            btnDelete.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 79, 68);
+            btnDelete.FlatAppearance.MouseDownBackColor = Color.FromArgb(235, 39, 28);
             if (File.Exists("remove.png"))
                 btnDelete.BackgroundImage = Image.FromFile("remove.png");
             btnDelete.Click += BtnDelete_Click;
@@ -587,17 +602,21 @@ namespace ActionMarque
         {
             var panel = new Panel
             {
-                Location = new Point(0, yPos),
-                Size = new Size(150, 40), // Ajuster à la nouvelle largeur
-                BackColor = Color.FromArgb(30, 30, 30),
+                Location = new Point(5, yPos),
+                Size = new Size(165, 42),
+                BackColor = Color.FromArgb(58, 58, 60),
                 BorderStyle = BorderStyle.None,
                 Cursor = Cursors.Hand
             };
 
+            // Effet hover
+            panel.MouseEnter += (s, e) => panel.BackColor = Color.FromArgb(72, 72, 74);
+            panel.MouseLeave += (s, e) => panel.BackColor = Color.FromArgb(58, 58, 60);
+
             var statusCircle = new Panel
             {
-                Location = new Point(10, 14),
-                Size = new Size(8, 8),
+                Location = new Point(12, 16),
+                Size = new Size(10, 10),
                 BackColor = GetStatusColor(brand.Status),
                 BorderStyle = BorderStyle.None
             };
@@ -606,21 +625,23 @@ namespace ActionMarque
             var nameLabel = new Label
             {
                 Text = brand.Name,
-                Location = new Point(25, 10),
-                Size = new Size(80, 20), // Réduire la largeur pour faire place au checkbox
+                Location = new Point(30, 12),
+                Size = new Size(95, 18),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 BackColor = Color.Transparent
             };
+            nameLabel.MouseEnter += (s, e) => panel.BackColor = Color.FromArgb(72, 72, 74);
+            nameLabel.MouseLeave += (s, e) => panel.BackColor = Color.FromArgb(58, 58, 60);
             panel.Controls.Add(nameLabel);
 
             var checkBox = new CheckBox
             {
-                Location = new Point(110, 10), // Position à droite
-                Size = new Size(15, 15),
+                Location = new Point(135, 13),
+                Size = new Size(18, 18),
                 Checked = brand.IsVisible,
                 BackColor = Color.Transparent,
-                ForeColor = Color.White
+                ForeColor = Color.FromArgb(0, 122, 255)
             };
             checkBox.CheckedChanged += (s, e) => ToggleBrandVisibility(brand, checkBox.Checked);
             panel.Controls.Add(checkBox);
@@ -636,11 +657,11 @@ namespace ActionMarque
             switch (status)
             {
                 case "positive":
-                    return Color.FromArgb(0, 200, 0);
+                    return Color.FromArgb(52, 199, 89); // Vert moderne iOS
                 case "negative":
-                    return Color.FromArgb(200, 0, 0);
+                    return Color.FromArgb(255, 59, 48); // Rouge moderne iOS
                 default:
-                    return Color.FromArgb(150, 150, 150);
+                    return Color.FromArgb(142, 142, 147); // Gris moderne iOS
             }
         }
 
@@ -684,10 +705,10 @@ namespace ActionMarque
 
             _filterPanel = new Panel
             {
-                Size = new Size(155, 300),
-                Location = new Point(8, 200),
-                BackColor = Color.FromArgb(60, 60, 60),
-                BorderStyle = BorderStyle.FixedSingle,
+                Size = new Size(178, 310),
+                Location = new Point(10, 190),
+                BackColor = Color.FromArgb(58, 58, 60),
+                BorderStyle = BorderStyle.None,
                 AutoScroll = true
             };
 
@@ -695,109 +716,117 @@ namespace ActionMarque
 
             var lblTitle = new Label
             {
-                Text = "Options de Filtre",
-                Location = new Point(10, yPos),
-                Size = new Size(135, 20),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                Text = "FILTRES",
+                Location = new Point(12, yPos),
+                Size = new Size(155, 20),
+                ForeColor = Color.FromArgb(0, 122, 255),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold)
             };
             _filterPanel.Controls.Add(lblTitle);
-            yPos += 30;
+            yPos += 35;
 
             // Section Plage d'années
             var lblYearRange = new Label
             {
-                Text = "Plage d'années:",
-                Location = new Point(10, yPos),
-                Size = new Size(135, 20),
-                ForeColor = Color.LightGray,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+                Text = "Période",
+                Location = new Point(12, yPos),
+                Size = new Size(155, 18),
+                ForeColor = Color.FromArgb(142, 142, 147),
+                Font = new Font("Segoe UI", 8, FontStyle.Regular)
             };
             _filterPanel.Controls.Add(lblYearRange);
-            yPos += 25;
+            yPos += 22;
 
             // Année de début
             var lblFrom = new Label
             {
-                Text = "De:",
-                Location = new Point(10, yPos),
-                Size = new Size(30, 20),
+                Text = "De",
+                Location = new Point(12, yPos),
+                Size = new Size(25, 18),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 8)
+                Font = new Font("Segoe UI", 9)
             };
             _filterPanel.Controls.Add(lblFrom);
 
             var numYearFrom = new NumericUpDown
             {
-                Location = new Point(40, yPos - 2),
-                Size = new Size(50, 20),
+                Location = new Point(38, yPos - 2),
+                Size = new Size(55, 22),
                 Minimum = 2020,
                 Maximum = 2025,
                 Value = 2020,
-                BackColor = Color.FromArgb(40, 40, 40),
+                BackColor = Color.FromArgb(44, 44, 46),
                 ForeColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                Font = new Font("Segoe UI", 9)
             };
             _filterPanel.Controls.Add(numYearFrom);
 
             var lblTo = new Label
             {
-                Text = "À:",
-                Location = new Point(95, yPos),
-                Size = new Size(20, 20),
+                Text = "à",
+                Location = new Point(98, yPos),
+                Size = new Size(15, 18),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 8)
+                Font = new Font("Segoe UI", 9)
             };
             _filterPanel.Controls.Add(lblTo);
 
             var numYearTo = new NumericUpDown
             {
                 Location = new Point(115, yPos - 2),
-                Size = new Size(30, 20),
+                Size = new Size(55, 22),
                 Minimum = 2020,
                 Maximum = 2025,
                 Value = 2025,
-                BackColor = Color.FromArgb(40, 40, 40),
+                BackColor = Color.FromArgb(44, 44, 46),
                 ForeColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                Font = new Font("Segoe UI", 9)
             };
             _filterPanel.Controls.Add(numYearTo);
-            yPos += 30;
+            yPos += 28;
 
             // Bouton appliquer filtre années
             var btnApplyYearFilter = new Button
             {
                 Text = "Appliquer",
-                Location = new Point(10, yPos),
-                Size = new Size(135, 25),
-                BackColor = Color.FromArgb(0, 120, 215),
+                Location = new Point(12, yPos),
+                Size = new Size(155, 28),
+                BackColor = Color.FromArgb(0, 122, 255),
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
+            btnApplyYearFilter.FlatAppearance.BorderSize = 0;
+            btnApplyYearFilter.FlatAppearance.MouseOverBackColor = Color.FromArgb(10, 132, 255);
+            btnApplyYearFilter.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 102, 204);
             btnApplyYearFilter.Click += (s, e) => ApplyYearFilter((int)numYearFrom.Value, (int)numYearTo.Value);
             _filterPanel.Controls.Add(btnApplyYearFilter);
-            yPos += 35;
+            yPos += 38;
 
             // Section Tri
             var lblSort = new Label
             {
-                Text = "Tri:",
-                Location = new Point(10, yPos),
-                Size = new Size(135, 20),
-                ForeColor = Color.LightGray,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+                Text = "Tri",
+                Location = new Point(12, yPos),
+                Size = new Size(155, 18),
+                ForeColor = Color.FromArgb(142, 142, 147),
+                Font = new Font("Segoe UI", 8, FontStyle.Regular)
             };
             _filterPanel.Controls.Add(lblSort);
-            yPos += 25;
+            yPos += 22;
 
             // ComboBox de tri dans le filtre
             var cmbFilterSort = new ComboBox
             {
-                Location = new Point(10, yPos),
-                Size = new Size(135, 25),
+                Location = new Point(12, yPos),
+                Size = new Size(155, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                BackColor = Color.FromArgb(40, 40, 40),
-                ForeColor = Color.White
+                BackColor = Color.FromArgb(44, 44, 46),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9)
             };
             cmbFilterSort.Items.AddRange(new[] { "A → Z", "Z → A", "Montante", "Chute" });
             cmbFilterSort.SelectedIndex = currentSortIndex;
@@ -811,25 +840,28 @@ namespace ActionMarque
             // Section Affichage
             var lblDisplay = new Label
             {
-                Text = "Affichage:",
-                Location = new Point(10, yPos),
-                Size = new Size(135, 20),
-                ForeColor = Color.LightGray,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+                Text = "Affichage",
+                Location = new Point(12, yPos),
+                Size = new Size(155, 18),
+                ForeColor = Color.FromArgb(142, 142, 147),
+                Font = new Font("Segoe UI", 8, FontStyle.Regular)
             };
             _filterPanel.Controls.Add(lblDisplay);
-            yPos += 25;
+            yPos += 22;
 
             // Bouton pour masquer toutes les marques
             var btnHideAll = new Button
             {
                 Text = "Masquer tout",
-                Location = new Point(10, yPos),
-                Size = new Size(65, 25),
-                BackColor = Color.FromArgb(100, 100, 100),
+                Location = new Point(12, yPos),
+                Size = new Size(75, 28),
+                BackColor = Color.FromArgb(72, 72, 74),
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8)
             };
+            btnHideAll.FlatAppearance.BorderSize = 0;
+            btnHideAll.FlatAppearance.MouseOverBackColor = Color.FromArgb(92, 92, 94);
             btnHideAll.Click += (s, e) => HideAllBrands();
             _filterPanel.Controls.Add(btnHideAll);
 
@@ -837,12 +869,15 @@ namespace ActionMarque
             var btnShowAll = new Button
             {
                 Text = "Afficher tout",
-                Location = new Point(80, yPos),
-                Size = new Size(65, 25),
-                BackColor = Color.FromArgb(100, 100, 100),
+                Location = new Point(92, yPos),
+                Size = new Size(75, 28),
+                BackColor = Color.FromArgb(72, 72, 74),
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8)
             };
+            btnShowAll.FlatAppearance.BorderSize = 0;
+            btnShowAll.FlatAppearance.MouseOverBackColor = Color.FromArgb(92, 92, 94);
             btnShowAll.Click += (s, e) => ShowAllBrands();
             _filterPanel.Controls.Add(btnShowAll);
             yPos += 35;
@@ -851,12 +886,16 @@ namespace ActionMarque
             var btnClose = new Button
             {
                 Text = "Fermer",
-                Location = new Point(10, yPos),
-                Size = new Size(135, 25),
-                BackColor = Color.FromArgb(150, 50, 50),
+                Location = new Point(12, yPos),
+                Size = new Size(155, 28),
+                BackColor = Color.FromArgb(255, 59, 48),
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
+            btnClose.FlatAppearance.BorderSize = 0;
+            btnClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 79, 68);
+            btnClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(235, 39, 28);
             btnClose.Click += (s, e) => {
                 rightPanel.Controls.Remove(_filterPanel);
                 _filterPanel.Dispose();
@@ -1830,11 +1869,11 @@ namespace ActionMarque
                     string zoomText;
                     if (currentZoomLevel <= 1.0)
                     {
-                        zoomText = $"Zoom: 1.0x ({granularityText})";
+                        zoomText = "Vue complète";
                     }
                     else
                     {
-                        zoomText = $"Zoom: {currentZoomLevel:F1}x ({granularityText})";
+                        zoomText = $"Zoom {currentZoomLevel:F1}x • {granularityText}";
                     }
                     lblGranularity.Text = zoomText;
                 }
