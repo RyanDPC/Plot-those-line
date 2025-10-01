@@ -12,6 +12,12 @@ using System.Runtime.InteropServices;
 
 namespace ActionMarque
 {
+    // Nom : Ryan De Pina Correia,
+    // Classe : CID3A,
+    // Date: : 27.08.2025,
+    // Projet : P_FUN
+    // Description : Le but de ce projet étant de créer un graphique de donnée sur une application.
+    //               Avec une api ou un fichier json / csv
     public partial class Form1 : Form
     {
         private Chart chart;

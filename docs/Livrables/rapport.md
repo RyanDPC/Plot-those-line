@@ -285,13 +285,13 @@ _A compléter_
 **Structure des fichiers :**
 Plot-those-line/
 ├── ActionMarque/ # Application principale C#
-│ ├── TwelveDataService.cs # Service API Twelve Data
-│ ├── Form1.cs # Interface utilisateur
-│ ├── AlphaVantageService.cs # Service API alternatif
-│ └── ActionMarque.csproj # Configuration projet
+| ├── TwelveDataService.cs # Service API Twelve Data
+| ├── Form1.cs # Interface utilisateur
+| ├── AlphaVantageService.cs # Service API alternatif
+| └── ActionMarque.csproj # Configuration projet
 ├── docs/ # Documentation
-│ ├── jdt.md # Journal de travail
-│ └── Livrables/rapport.md # Rapport de projet
+| ├── jdt.md # Journal de travail
+| └── Livrables/rapport.md # Rapport de projet
 └── script/ # Scripts d'automatisation
 ├── generate-jdt.py # Génération JDT automatique
 └── export-rapport.bat # Export PDF du rapport
@@ -320,26 +320,65 @@ _A compléter_
 # 5. Tests
 
 ## 5.1 Dossier des tests  
-_A compléter_
+
+### Version de l'application testée : 1.0.0
+### Date du test : [À compléter]
+### Nom du testeur : [À compléter]
+
+### **Scénario 1 : Ajout de marque**
+
+| Étape | Description | Remarque |
+|-------|-------------|----------|
+| **Arrange / Given** | AjoutMarque - Cliquer sur le bouton ajouter qui est un logo de (+) | Interface utilisateur avec bouton d'ajout |
+| **Act / When** | Écrire le symbole ou le nom d'une marque à l'endroit prévu | Il est possible que l'API ne contienne pas toutes les marques et que le fichier .txt ne contienne pas toutes les conversions entre nom et symbole pour bien envoyer la requête à l'API |
+| **Assert / Then** | Affiche sur le graphique la ligne des données récoltées. Il doit être sur le panel de droite nom inscrit un checkbox pour l'afficher ou non. | Vérification de l'affichage graphique et de la gestion de la visibilité |
+| **Résultat** |[x] OK [] KO | |
+| **Remarque** | | |
 
 ---
 
-# 6. Conclusion
+### **Scénario 2 : Suppression de marque**
 
-## 6.1 Bilan des fonctionnalités demandées  
+| Étape | Description | Remarque |
+|-------|-------------|----------|
+| **Arrange / Given** | Suppression d'une marque | Préparation de la suppression |
+| **Act / When** | Cliquer sur le bouton de la marque, elle se met dans la zone de texte | Sélection de la marque à supprimer |
+| **Assert / Then** | Quand je clique sur le bouton suppression à sa droite. La marque se supprime. | Vérification de la suppression effective |
+| **Résultat** | [x] OK ☐ KO | |
+| **Remarque** | | |
+
+---
+
+### **Scénario 3 : Calcul des statistiques**
+
+| Étape | Description | Remarque |
+|-------|-------------|----------|
+| **Arrange / Given** | Calculer le Min, Max, Average de la marque | Préparation du calcul statistique |
+| **Act / When** | Quand je clique sur le bouton de la marque (le texte) | Sélection de la marque pour afficher ses statistiques |
+| **Assert / Then** | En bas à droite nous pouvons voir un texte s'afficher. Écrit : Min : …, Max : …, Avg : … | Vérification de l'affichage des statistiques |
+| **Résultat** | [x] OK ☐ KO | |
+| **Remarque** | | |
+
+# 6. Usage de l'IA
+Je vais dire point par point comment j'ai utilisé l'IA dans ce projet. Pour commencer j'ai utilisé l'IA pour :
+- 1. Mon rapport : uniquement pour le visuel et pour m'aider à implémenter le style de l'ETML pour l'en-tête vu que je voulais créer un template markdown pour de futur projet.
+- 2. Mon code : Pour les extensions niveaux syntaxes qu 
+# 7. Conclusion
+
+## 7.1 Bilan des fonctionnalités demandées  
 _A compléter_
 
-## 6.2 Bilan de la planification  
+## 7.2 Bilan de la planification  
 _A compléter_
 
-## 6.3 Bilan personnel  
+## 7.3 Bilan personnel  
 
 J'ai particulièrement apprécié la réalisation de ce rapport car cela m'a permis de créer un template réutilisable pour mes futurs projets GitHub. Cette approche de documentation structurée me sera très utile pour organiser mes travaux. Concernant la partie développement, j'ai constaté que l'utilisation d'une API avec C# présente certaines difficultés pour moi. Je trouve que la visualisation et la compréhension du code sont plus complexes dans ce langage comparé à d'autres frameworks que j'ai pu utiliser. L'utilisation de Visual Studio 2022 a également représenté un défi supplémentaire. N'étant pas familier avec cet environnement de développement, je l'ai trouvé moins intuitif que d'autres IDE que j'utilise habituellement. Néanmoins, cette expérience m'a permis de découvrir un nouvel outil professionnel et de sortir de ma zone de confort technologique, ce qui enrichit mon profil de développeur.
 
 ---
 
-# 7. Divers
+# 8. Divers
 
-## 7.1 Journal de travail  
+## 8.1 Journal de travail  
 - **Suivi :** Journal de travail détaillé → [📋 Consulter le JDT](../jdt.md)
 </div>
