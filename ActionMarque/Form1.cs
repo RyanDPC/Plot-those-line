@@ -19,9 +19,9 @@ namespace ActionMarque
         private TextBox txtValues;
         private Button btnAdd;
         private Button btnDelete;
-        private ComboBox cmbSort;
         private Label lblStats;
         private Button btnFilter;
+        private int currentSortIndex = 0; // Index du tri actuel (0=A→Z, 1=Z→A, 2=Montante, 3=Chute)
 
         private List<Color> colorPalette = new List<Color>
         {
@@ -295,27 +295,13 @@ namespace ActionMarque
             brandListPanel = new Panel
             {
                 Location = new Point(8, yPos), // Ajuster la position
-                Size = new Size(160, 300), // Ajuster à la nouvelle largeur
+                Size = new Size(160, 360), // Augmenter la hauteur pour compenser la suppression du tri
                 BackColor = Color.Transparent,
                 AutoScroll = true
             };
             rightPanel.Controls.Add(brandListPanel);
 
-            yPos += 320;
-
-            // Sorting ComboBox
-            cmbSort = new ComboBox
-            {
-                Location = new Point(20, yPos),
-                Size = new Size(120, 25),
-                DropDownStyle = ComboBoxStyle.DropDownList
-            };
-            cmbSort.Items.AddRange(new[] { "A → Z", "Z → A", "Montante", "Chute" });
-            cmbSort.SelectedIndex = 0;
-            cmbSort.SelectedIndexChanged += (s, e) => RefreshBrandList();
-            rightPanel.Controls.Add(cmbSort);
-
-            yPos += 40;
+            yPos += 380;
 
             var addSection = new Panel
             {
@@ -571,20 +557,19 @@ namespace ActionMarque
             brandListPanel.Controls.Clear();
 
             IEnumerable<BrandItem> sorted = brands;
-            string selectedSort = cmbSort.SelectedItem?.ToString() ?? "A → Z";
 
-            switch (selectedSort)
+            switch (currentSortIndex)
             {
-                case "A → Z":
+                case 0: // A → Z
                     sorted = brands.OrderBy(b => b.Name);
                     break;
-                case "Z → A":
+                case 1: // Z → A
                     sorted = brands.OrderByDescending(b => b.Name);
                     break;
-                case "Montante":
+                case 2: // Montante
                     sorted = brands.OrderByDescending(b => b.Values.Last() - b.Values.First());
                     break;
-                case "Chute":
+                case 3: // Chute
                     sorted = brands.OrderBy(b => b.Values.Last() - b.Values.First());
                     break;
             }
@@ -699,42 +684,151 @@ namespace ActionMarque
 
             _filterPanel = new Panel
             {
-                Size = new Size(160, 180),
-                Location = new Point(10, 200), // Position plus bas pour éviter le chevauchement
+                Size = new Size(155, 300),
+                Location = new Point(8, 200),
                 BackColor = Color.FromArgb(60, 60, 60),
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                AutoScroll = true
             };
+
+            int yPos = 10;
 
             var lblTitle = new Label
             {
                 Text = "Options de Filtre",
-                Location = new Point(10, 10),
-                Size = new Size(160, 20),
+                Location = new Point(10, yPos),
+                Size = new Size(135, 20),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
             _filterPanel.Controls.Add(lblTitle);
+            yPos += 30;
 
-            // Checkbox pour afficher/masquer toutes les marques
-            var chkShowAll = new CheckBox
+            // Section Plage d'années
+            var lblYearRange = new Label
             {
-                Text = "Afficher toutes les marques",
-                Location = new Point(10, 40),
-                Size = new Size(160, 20),
-                ForeColor = Color.White,
-                Checked = true
+                Text = "Plage d'années:",
+                Location = new Point(10, yPos),
+                Size = new Size(135, 20),
+                ForeColor = Color.LightGray,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
-            chkShowAll.CheckedChanged += (s, e) => ToggleAllBrands(chkShowAll.Checked);
-            _filterPanel.Controls.Add(chkShowAll);
+            _filterPanel.Controls.Add(lblYearRange);
+            yPos += 25;
+
+            // Année de début
+            var lblFrom = new Label
+            {
+                Text = "De:",
+                Location = new Point(10, yPos),
+                Size = new Size(30, 20),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 8)
+            };
+            _filterPanel.Controls.Add(lblFrom);
+
+            var numYearFrom = new NumericUpDown
+            {
+                Location = new Point(40, yPos - 2),
+                Size = new Size(50, 20),
+                Minimum = 2020,
+                Maximum = 2025,
+                Value = 2020,
+                BackColor = Color.FromArgb(40, 40, 40),
+                ForeColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            _filterPanel.Controls.Add(numYearFrom);
+
+            var lblTo = new Label
+            {
+                Text = "À:",
+                Location = new Point(95, yPos),
+                Size = new Size(20, 20),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 8)
+            };
+            _filterPanel.Controls.Add(lblTo);
+
+            var numYearTo = new NumericUpDown
+            {
+                Location = new Point(115, yPos - 2),
+                Size = new Size(30, 20),
+                Minimum = 2020,
+                Maximum = 2025,
+                Value = 2025,
+                BackColor = Color.FromArgb(40, 40, 40),
+                ForeColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            _filterPanel.Controls.Add(numYearTo);
+            yPos += 30;
+
+            // Bouton appliquer filtre années
+            var btnApplyYearFilter = new Button
+            {
+                Text = "Appliquer",
+                Location = new Point(10, yPos),
+                Size = new Size(135, 25),
+                BackColor = Color.FromArgb(0, 120, 215),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnApplyYearFilter.Click += (s, e) => ApplyYearFilter((int)numYearFrom.Value, (int)numYearTo.Value);
+            _filterPanel.Controls.Add(btnApplyYearFilter);
+            yPos += 35;
+
+            // Section Tri
+            var lblSort = new Label
+            {
+                Text = "Tri:",
+                Location = new Point(10, yPos),
+                Size = new Size(135, 20),
+                ForeColor = Color.LightGray,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+            };
+            _filterPanel.Controls.Add(lblSort);
+            yPos += 25;
+
+            // ComboBox de tri dans le filtre
+            var cmbFilterSort = new ComboBox
+            {
+                Location = new Point(10, yPos),
+                Size = new Size(135, 25),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                BackColor = Color.FromArgb(40, 40, 40),
+                ForeColor = Color.White
+            };
+            cmbFilterSort.Items.AddRange(new[] { "A → Z", "Z → A", "Montante", "Chute" });
+            cmbFilterSort.SelectedIndex = currentSortIndex;
+            cmbFilterSort.SelectedIndexChanged += (s, e) => {
+                currentSortIndex = cmbFilterSort.SelectedIndex;
+                RefreshBrandList();
+            };
+            _filterPanel.Controls.Add(cmbFilterSort);
+            yPos += 35;
+
+            // Section Affichage
+            var lblDisplay = new Label
+            {
+                Text = "Affichage:",
+                Location = new Point(10, yPos),
+                Size = new Size(135, 20),
+                ForeColor = Color.LightGray,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+            };
+            _filterPanel.Controls.Add(lblDisplay);
+            yPos += 25;
 
             // Bouton pour masquer toutes les marques
             var btnHideAll = new Button
             {
                 Text = "Masquer tout",
-                Location = new Point(10, 70),
-                Size = new Size(80, 25),
+                Location = new Point(10, yPos),
+                Size = new Size(65, 25),
                 BackColor = Color.FromArgb(100, 100, 100),
-                ForeColor = Color.White
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnHideAll.Click += (s, e) => HideAllBrands();
             _filterPanel.Controls.Add(btnHideAll);
@@ -743,22 +837,25 @@ namespace ActionMarque
             var btnShowAll = new Button
             {
                 Text = "Afficher tout",
-                Location = new Point(100, 70),
-                Size = new Size(80, 25),
+                Location = new Point(80, yPos),
+                Size = new Size(65, 25),
                 BackColor = Color.FromArgb(100, 100, 100),
-                ForeColor = Color.White
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnShowAll.Click += (s, e) => ShowAllBrands();
             _filterPanel.Controls.Add(btnShowAll);
+            yPos += 35;
 
             // Bouton fermer
             var btnClose = new Button
             {
                 Text = "Fermer",
-                Location = new Point(10, 110),
-                Size = new Size(160, 25),
+                Location = new Point(10, yPos),
+                Size = new Size(135, 25),
                 BackColor = Color.FromArgb(150, 50, 50),
-                ForeColor = Color.White
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnClose.Click += (s, e) => {
                 rightPanel.Controls.Remove(_filterPanel);
@@ -769,6 +866,7 @@ namespace ActionMarque
             _filterPanel.Controls.Add(btnClose);
 
             rightPanel.Controls.Add(_filterPanel);
+            _filterPanel.BringToFront();
         }
 
         private void ToggleAllBrands(bool showAll)
@@ -811,6 +909,36 @@ namespace ActionMarque
                 }
             }
             RefreshBrandList();
+        }
+
+        private void ApplyYearFilter(int yearFrom, int yearTo)
+        {
+            try
+            {
+                var chartArea = chart.ChartAreas[0];
+                
+                // Convertir les années en dates OADate
+                var minDate = new DateTime(yearFrom, 1, 1);
+                var maxDate = new DateTime(yearTo, 12, 31);
+                
+                // Appliquer le filtre de zoom sur la plage d'années
+                chartArea.AxisX.ScaleView.Zoom(minDate.ToOADate(), maxDate.ToOADate());
+                
+                // Mettre à jour le titre
+                var yearRange = yearFrom == yearTo ? yearFrom.ToString() : $"{yearFrom}-{yearTo}";
+                UpdateChartTitle($"Vente Marques - Période: {yearRange}");
+                
+                // Forcer la mise à jour
+                chart.Invalidate();
+                chart.Refresh();
+                
+                System.Diagnostics.Debug.WriteLine($"Filtre appliqué: {yearFrom} à {yearTo}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur lors de l'application du filtre: {ex.Message}");
+                MessageBox.Show($"Erreur lors de l'application du filtre: {ex.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         private void SelectBrand(BrandItem brand)
         {
