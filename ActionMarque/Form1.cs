@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Runtime.InteropServices;
 
 namespace ActionMarque
 {
@@ -1026,14 +1027,10 @@ namespace ActionMarque
                 }
 
                 RefreshBrandList();
-                
-                
-                System.Diagnostics.Debug.WriteLine($"Ajout marque terminé: {input}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Erreur ajout marque {input}: {ex.Message}");
-                MessageBox.Show($"Erreur lors du chargement des données pour {input}: {ex.Message}");
+                MessageBox.Show($"Erreur ajout marque {input}: {ex.Message}");
             }
             finally
             {
@@ -1091,8 +1088,12 @@ namespace ActionMarque
                 return Array.Empty<double>();
 
             var parts = input.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var result = new List<double>();
-
+            var result = parts.Select(s => double.TryParse(s.Replace(",", "."), out double value) ? (double?)value :null)
+                .Where(part => part.HasValue)
+                .Select(part => part.Value)
+                .ToList();
+            
+            //parts.Select(s => s.Replace(',', '.').Where(double.TryParse(s, out double value));
             foreach (var part in parts)
             {
                 var cleaned = part.Replace(',', '.'); // Remplacer virgule par point
