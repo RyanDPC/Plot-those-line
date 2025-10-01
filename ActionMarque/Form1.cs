@@ -65,27 +65,15 @@ namespace ActionMarque
 
         private void LoadBrandDictionary(string filePath)
         {
-            if (!File.Exists(filePath))
-            {
-                MessageBox.Show($"Le fichier {filePath} est introuvable. Le dictionnaire est vide.");
-                return;
-            }
+            if (!File.Exists(filePath)) return;
 
-            foreach (var line in File.ReadAllLines(filePath))
-            {
-                if (string.IsNullOrWhiteSpace(line) || !line.Contains("="))
-                    continue;
-
-                var parts = line.Split('=');
-                if (parts.Length == 2)
-                {
-                    string fullName = parts[0].Trim();
-                    string symbol = parts[1].Trim();
-                    if (!brandMap.ContainsKey(fullName))
-                        brandMap[fullName] = symbol;
-                }
-            }
+            File.ReadAllLines(filePath)
+                .Select(line => line.Split(new[] { '=' }, 2))          // Séparer chaque ligne en 2 parties
+                .Where(parts => parts.Length == 2)           // Garder uniquement les lignes valides
+                .ToList()
+                .ForEach(parts => brandMap[parts[0].Trim()] = parts[1].Trim());
         }
+
 
         private void SetupUI()
         {
@@ -140,7 +128,7 @@ namespace ActionMarque
             chartArea.AxisX.MajorGrid.Enabled = false;
             chartArea.AxisX.LabelStyle.ForeColor = Color.White;
             chartArea.AxisX.LineColor = Color.White;
-            chartArea.AxisX.Title = "Période (24/09/2020 - 23/09/2025)";
+            chartArea.AxisX.Title = "Date";
             chartArea.AxisX.TitleForeColor = Color.White;
             chartArea.AxisX.IntervalType = DateTimeIntervalType.Months;
             chartArea.AxisX.Interval = 1; // Afficher chaque mois
@@ -384,9 +372,11 @@ namespace ActionMarque
 
         private async void LoadData()
         {
+            // Réinitialiser les marques et le panneau
             brands.Clear();
             brandListPanel.Controls.Clear();
 
+            // Label de chargement
             var loadingLabel = new Label
             {
                 Text = "Chargement des données...",
@@ -400,24 +390,25 @@ namespace ActionMarque
             try
             {
                 suppressItemCheckEvents = true;
+
+                // Récupérer les symboles et les données
                 var symbols = brandMap.Values.ToArray();
                 var brandData = await apiService.GetMultipleStocksDataAsync(symbols);
 
-                if (brandData.Count > 0)
-                {
-                    foreach (var data in brandData)
+                // Ajouter les séries pour chaque marque si des données existent
+                brandData
+                    .Where(data => data.DataPoints.Count > 0) // Filtrer les marques sans données
+                    .ToList()
+                    .ForEach(data =>
                     {
-                        if (data.DataPoints.Count > 0)
-                        {
-                            var prices = data.DataPoints.Select(dp => dp.Price).ToArray();
-                            string displayName = brandMap.FirstOrDefault(x => x.Value == data.Name).Key ?? data.Name;
-                            AddBrandSeriesWithDates(displayName, prices, data.DataPoints);
-                        }
-                    }
-                }
+                        var prices = data.DataPoints.Select(dp => dp.Price).ToArray();
+                        string displayName = brandMap.FirstOrDefault(x => x.Value == data.Name).Key ?? data.Name;
+
+                        AddBrandSeriesWithDates(displayName, prices, data.DataPoints);
+                    });
+
                 suppressItemCheckEvents = false;
                 RefreshBrandList();
-                
             }
             catch (Exception ex)
             {
@@ -426,75 +417,68 @@ namespace ActionMarque
             }
             finally
             {
+                // Retirer le label de chargement
                 brandListPanel.Controls.Remove(loadingLabel);
             }
         }
+
 
         private void AddBrandSeries(string name, double[] values, Color? fixedColor = null)
         {
             AddBrandSeriesWithDates(name, values, null, fixedColor);
         }
-        
+
         private void AddBrandSeriesWithDates(string name, double[] values, List<StockDataPoint> dataPoints = null, Color? fixedColor = null)
         {
             var seriesColor = fixedColor ?? colorPalette[colorIndex++ % colorPalette.Count];
-            
-            try
-        {
-            var existing = chart.Series.FindByName(name);
-            if (existing != null)
-            {
-                chart.Series.Remove(existing);
-            }
-                
-            var s = new Series(name)
-            {
-                ChartType = SeriesChartType.Line,
-                BorderWidth = 3,
-                Color = seriesColor,
-                ChartArea = "main",
-                XValueType = ChartValueType.DateTime,
-                Enabled = true
-            };
 
+            try
+            {
+                // Supprimer l'existante si elle existe
+                chart.Series.FindByName(name)?.Let(existing => chart.Series.Remove(existing));
+
+                var s = new Series(name)
+                {
+                    ChartType = SeriesChartType.Line,
+                    BorderWidth = 3,
+                    Color = seriesColor,
+                    ChartArea = "main",
+                    XValueType = ChartValueType.DateTime,
+                    Enabled = true
+                };
+
+                // Ajouter les points à la série
                 if (dataPoints != null && dataPoints.Count > 0)
                 {
-                    // Utiliser la logique simple qui fonctionne du test
-                    foreach (var point in dataPoints)
+                    dataPoints.ForEach(point =>
                     {
                         s.Points.AddXY(point.Date, point.Price);
                         System.Diagnostics.Debug.WriteLine($"Point ajouté: {point.Date:dd/MM/yyyy} = {point.Price:F2}");
-                    }
-                    
+                    });
                     System.Diagnostics.Debug.WriteLine($"Série {name} ajoutée avec {s.Points.Count} points (dates réelles)");
                 }
                 else
                 {
-                    // Fallback : utiliser les dates par défaut (années)
-            for (int i = 0; i < values.Length; i++)
-            {
-                        var pointDate = new DateTime(baseYear + i, 1, 1);
-                            s.Points.AddXY(pointDate, values[i]);
-                    }
+                    values.Select((val, i) => new DateTime(baseYear + i, 1, 1)) // Crée une date pour chaque valeur : 1er janvier de l'année correspondante
+                          .Zip(values, (date, val) => new { date, val }) // Associe chaque date à la valeur correspondante
+                          .ToList()
+                          .ForEach(item => s.Points.AddXY(item.date, item.val));  // Ajoute chaque point (date, valeur) à la série
                     System.Diagnostics.Debug.WriteLine($"Série {name} ajoutée avec {s.Points.Count} points (dates par défaut)");
                 }
-                
-                // Ajouter la série
-            chart.Series.Add(s);
-                
-                // Forcer la mise à jour (copiée du test qui fonctionne)
+
+                chart.Series.Add(s);
+
+                // Mise à jour du graphique
                 chart.Invalidate();
                 chart.Refresh();
-                
-                // S'assurer que l'axe X affiche toute la plage
+
+                // Configurer l'axe X
                 var chartArea = chart.ChartAreas[0];
-                var minDate = new DateTime(2020, 9, 24);
-                var maxDate = new DateTime(2025, 9, 23);
-                chartArea.AxisX.Minimum = minDate.ToOADate();
-                chartArea.AxisX.Maximum = maxDate.ToOADate();
+                chartArea.AxisX.Minimum = new DateTime(2020, 9, 24).ToOADate();
+                chartArea.AxisX.Maximum = new DateTime(2025, 9, 23).ToOADate();
                 chartArea.AxisX.ScaleView.ZoomReset();
-                
-                // Reconfigurer les labels personnalisés
+
+                // Labels personnalisés
                 SetupSimpleAxisLabels(chartArea);
             }
             catch (Exception ex)
@@ -502,6 +486,7 @@ namespace ActionMarque
                 System.Diagnostics.Debug.WriteLine($"Erreur dans AddBrandSeries pour {name}: {ex.Message}");
             }
 
+            // Calculer le statut et mettre à jour la liste des marques
             var status = ComputeStatus(values);
             var brandItem = new BrandItem
             {
@@ -517,102 +502,106 @@ namespace ActionMarque
             brands.Add(brandItem);
         }
 
-        private static string ComputeStatus(IReadOnlyList<double> values)
+
+        // Helper simple pour calculer le statut d'une marque
+        private static string ComputeStatus(IReadOnlyList<double> values) // IReadOnlyList: liste accessible en lecture seule, indexable mais non modifiable
         {
-            if (values.Count == 0) return "neutral";
-            
-            // Pour les données réelles d'actions, comparons les valeurs récentes
-            // Si on a plus de 10 points, comparons les 25% les plus récents avec les 25% les plus anciens
-            if (values.Count >= 4)
+            // Pas de données : retourne "neutral"
+            if (values.Count == 0)
+                return "neutral";
+
+            // Si peu de données (<4), comparaison simple du premier et dernier élément
+            if (values.Count < 4)
             {
-                int quarterSize = Math.Max(1, values.Count / 4);
-                
-                // Moyenne du premier quart (anciennes valeurs)
-                double oldAvg = 0;
-                for (int i = 0; i < quarterSize; i++)
-                {
-                    oldAvg += values[i];
-                }
-                oldAvg /= quarterSize;
-                
-                // Moyenne du dernier quart (valeurs récentes)
-                double newAvg = 0;
-                for (int i = values.Count - quarterSize; i < values.Count; i++)
-                {
-                    newAvg += values[i];
-                }
-                newAvg /= quarterSize;
-                
-                var diff = newAvg - oldAvg;
-                var percentChange = Math.Abs(diff) / oldAvg * 100;
-                
-                // Seuil de 5% pour éviter les changements trop petits
-                if (percentChange > 5)
-                {
-                    if (diff > 0) return "positive";
-                    if (diff < 0) return "negative";
-                }
+                double firstValue = values[0];
+                double lastValue = values[values.Count - 1];
+                double diff = lastValue - firstValue;
+
+                // Différence négligeable
+                if (Math.Abs(diff) <= 0.01)
+                    return "neutral";
+
+                // Différence positive ou négative
+                return diff > 0 ? "positive" : "negative";
             }
-            else
+
+            // Pour plus de données, comparer le premier quart et le dernier quart
+            int quarterSize = Math.Max(1, values.Count / 4);
+
+            // Moyenne du premier quart (anciennes valeurs)
+            double oldAvg = values.Take(quarterSize).Average();
+
+            // Moyenne du dernier quart (valeurs récentes)
+            double newAvg = values.Skip(values.Count - quarterSize).Average();
+
+            // Changement en pourcentage
+            double percentChange = Math.Abs(newAvg - oldAvg) / oldAvg * 100;
+
+            // Si le changement est inférieur à 5%, neutre
+            if (percentChange <= 5.0)
+                return "neutral";
+
+            // Retourner selon la tendance
+            return newAvg > oldAvg ? "positive" : "negative";
+        }
+
+
+        // Helper pour trier les marques selon l'index de tri
+        private IEnumerable<BrandItem> SortBrands(IEnumerable<BrandItem> brands, int sortIndex)
+        {
+            switch (sortIndex)
             {
-                // Pour peu de données, comparaison simple
-            var diff = values[values.Count - 1] - values[0];
-                if (Math.Abs(diff) > 0.01) // Seuil minimal
-                {
-            if (diff > 0) return "positive";
-            if (diff < 0) return "negative";
-                }
+                case 0:
+                    return brands.OrderBy(b => b.Name);
+                case 1:
+                    return brands.OrderByDescending(b => b.Name);
+                case 2:
+                    return brands.OrderByDescending(b => b.Values.LastOrDefault() - b.Values.FirstOrDefault());
+                case 3:
+                    return brands.OrderBy(b => b.Values.LastOrDefault() - b.Values.FirstOrDefault());
+                default:
+                    return brands;
             }
-            
-            return "neutral";
         }
 
         private void RefreshBrandList()
         {
             brandListPanel.Controls.Clear();
 
-            IEnumerable<BrandItem> sorted = brands;
+            var sortedBrands = SortBrands(brands, currentSortIndex);
 
-            switch (currentSortIndex)
-            {
-                case 0: // A → Z
-                    sorted = brands.OrderBy(b => b.Name);
-                    break;
-                case 1: // Z → A
-                    sorted = brands.OrderByDescending(b => b.Name);
-                    break;
-                case 2: // Montante
-                    sorted = brands.OrderByDescending(b => b.Values.Last() - b.Values.First());
-                    break;
-                case 3: // Chute
-                    sorted = brands.OrderBy(b => b.Values.Last() - b.Values.First());
-                    break;
-            }
-
-            int yPos = 10;
-            foreach (var brand in sorted)
-            {
-                var brandPanel = CreateBrandItemPanel(brand, yPos);
-                brandListPanel.Controls.Add(brandPanel);
-                yPos += 45;
-            }
+            sortedBrands
+                .Select((brand, index) => new { brand, yPos = 10 + index * 45 }) // Calculer yPos pour chaque marque
+                .ToList()
+                .ForEach(item =>
+                {
+                    var brandPanel = CreateBrandItemPanel(item.brand, item.yPos);
+                    brandListPanel.Controls.Add(brandPanel);
+                });
         }
 
+        // Création simple et lisible d'un panel de marque
         private Panel CreateBrandItemPanel(BrandItem brand, int yPos)
         {
+            var normalColor = Color.FromArgb(58, 58, 60);
+            var hoverColor = Color.FromArgb(72, 72, 74);
+
+            // Créer le panel principal
             var panel = new Panel
             {
                 Location = new Point(5, yPos),
                 Size = new Size(165, 42),
-                BackColor = Color.FromArgb(58, 58, 60),
+                BackColor = normalColor,
                 BorderStyle = BorderStyle.None,
                 Cursor = Cursors.Hand
             };
 
-            // Effet hover
-            panel.MouseEnter += (s, e) => panel.BackColor = Color.FromArgb(72, 72, 74);
-            panel.MouseLeave += (s, e) => panel.BackColor = Color.FromArgb(58, 58, 60);
+            // Ajouter l'effet hover
+            panel.MouseEnter += (s, e) => panel.BackColor = hoverColor;
+            panel.MouseLeave += (s, e) => panel.BackColor = normalColor;
+            panel.Click += (s, e) => SelectBrand(brand);
 
+            // Créer le cercle de statut
             var statusCircle = new Panel
             {
                 Location = new Point(12, 16),
@@ -622,6 +611,7 @@ namespace ActionMarque
             };
             panel.Controls.Add(statusCircle);
 
+            // Créer le label du nom
             var nameLabel = new Label
             {
                 Text = brand.Name,
@@ -631,10 +621,12 @@ namespace ActionMarque
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 BackColor = Color.Transparent
             };
-            nameLabel.MouseEnter += (s, e) => panel.BackColor = Color.FromArgb(72, 72, 74);
-            nameLabel.MouseLeave += (s, e) => panel.BackColor = Color.FromArgb(58, 58, 60);
+            nameLabel.MouseEnter += (s, e) => panel.BackColor = hoverColor;
+            nameLabel.MouseLeave += (s, e) => panel.BackColor = normalColor;
+            nameLabel.Click += (s, e) => SelectBrand(brand);
             panel.Controls.Add(nameLabel);
 
+            // Créer la checkbox de visibilité
             var checkBox = new CheckBox
             {
                 Location = new Point(135, 13),
@@ -646,20 +638,18 @@ namespace ActionMarque
             checkBox.CheckedChanged += (s, e) => ToggleBrandVisibility(brand, checkBox.Checked);
             panel.Controls.Add(checkBox);
 
-            panel.Click += (s, e) => SelectBrand(brand);
-            nameLabel.Click += (s, e) => SelectBrand(brand);
-
             return panel;
         }
 
+        // Style fonctionnel : compatible C# 7.3
         private Color GetStatusColor(string status)
         {
             switch (status)
             {
                 case "positive":
-                    return Color.FromArgb(52, 199, 89); // Vert moderne iOS
+                    return Color.FromArgb(52, 199, 89);   // Vert moderne iOS
                 case "negative":
-                    return Color.FromArgb(255, 59, 48); // Rouge moderne iOS
+                    return Color.FromArgb(255, 59, 48);   // Rouge moderne iOS
                 default:
                     return Color.FromArgb(142, 142, 147); // Gris moderne iOS
             }
@@ -908,47 +898,24 @@ namespace ActionMarque
             _filterPanel.BringToFront();
         }
 
+        // Helper pour basculer la visibilité
         private void ToggleAllBrands(bool showAll)
         {
-            foreach (var brand in brands)
+            brands.ForEach(brand =>
             {
                 brand.IsVisible = showAll;
                 var series = chart.Series.FindByName(brand.Name);
                 if (series != null)
-                {
                     series.Enabled = showAll;
-                }
-            }
+            });
+
             RefreshBrandList();
         }
 
-        private void HideAllBrands()
-        {
-            foreach (var brand in brands)
-            {
-                brand.IsVisible = false;
-                var series = chart.Series.FindByName(brand.Name);
-                if (series != null)
-                {
-                    series.Enabled = false;
-                }
-            }
-            RefreshBrandList();
-        }
 
-        private void ShowAllBrands()
-        {
-            foreach (var brand in brands)
-            {
-                brand.IsVisible = true;
-                var series = chart.Series.FindByName(brand.Name);
-                if (series != null)
-                {
-                    series.Enabled = true;
-                }
-            }
-            RefreshBrandList();
-        }
+        private void HideAllBrands() => ToggleAllBrands(false);
+
+        private void ShowAllBrands() => ToggleAllBrands(true);
 
         private void ApplyYearFilter(int yearFrom, int yearTo)
         {
@@ -1021,9 +988,14 @@ namespace ActionMarque
                     displayName = input;
                 }
 
-                System.Diagnostics.Debug.WriteLine($"Recherche données pour symbole: {symbole}");
-                var data = await apiService.GetStockDataAsync(symbole);
-                System.Diagnostics.Debug.WriteLine($"Données reçues: {data.Count} points");
+                // Utiliser la granularité actuelle du zoom pour charger les données
+                System.Diagnostics.Debug.WriteLine($"Recherche données pour symbole: {symbole} avec granularité: {currentGranularity}");
+                
+                // Déterminer le nombre d'années à charger selon la granularité
+                int yearsToLoad = (currentGranularity == DataGranularity.Monthly) ? 1 : 5;
+                
+                var data = await apiService.GetStockDataAsync(symbole, yearsToLoad, currentGranularity);
+                System.Diagnostics.Debug.WriteLine($"Données reçues: {data.Count} points avec granularité {currentGranularity}");
                 
                 if (data.Count > 0)
                 {
@@ -1034,12 +1006,12 @@ namespace ActionMarque
                         System.Diagnostics.Debug.WriteLine($"Symbole ajouté au dictionnaire: {displayName} -> {symbole}");
                     }
                     
-                    // Ajouter directement au graphique avec les vraies données de l'API
+                    // Ajouter directement au graphique avec les vraies données de l'API et la granularité actuelle
                     var prices = data.Select(dp => dp.Price).ToArray();
                     AddBrandSeriesWithDates(displayName, prices, data);
                     
                     
-                    System.Diagnostics.Debug.WriteLine($"Marque ajoutée: {displayName} avec {prices.Length} points");
+                    MessageBox.Show($"Marque ajoutée: {displayName.ToUpper()}");
                 }
                 else
                 {
@@ -1069,6 +1041,7 @@ namespace ActionMarque
             }
         }
 
+        // Helper pour afficher les statistiques d'une ligne
         private void VleLine(string line)
         {
             var series = chart.Series.FindByName(line);
@@ -1079,48 +1052,59 @@ namespace ActionMarque
             }
 
             var values = series.Points.Select(p => p.YValues[0]).ToList();
-            double min = values.Min();
-            double max = values.Max();
-            double avg = values.Average();
+            var min = values.Min();
+            var max = values.Max();
+            var avg = values.Average();
 
-            lblStats.Text = $"Min: {min:F2}   Max: {max:F2}   Avg: {avg:F2}";
+            lblStats.Text = $"Min: {min:F2}$  Max: {max:F2}$  Avg: {avg:F2}$";
         }
 
+        // Suppression simple et lisible d'une marque
         private void BtnDelete_Click(object sender, EventArgs e)
         {
             var name = (txtValues.Text ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(name)) return;
 
-            // Supprimer directement de la liste et du graphique
+            if (string.IsNullOrWhiteSpace(name))
+                return;
+
+            // Supprimer de la liste des marques
             brands.RemoveAll(b => b.Name == name);
 
-            var seriesToRemove = chart.Series.Cast<Series>().Where(s => s.Name == name).ToList();
-            foreach (var series in seriesToRemove)
-            {
-                chart.Series.Remove(series);
-            }
-            
+            // Supprimer les séries du graphique directement
+            chart.Series.Cast<Series>()
+                .Where(s => s.Name == name)
+                .ToList()
+                .ForEach(s => chart.Series.Remove(s));
+
             System.Diagnostics.Debug.WriteLine($"Marque supprimée: {name}");
 
+            // Rafraîchir l'affichage
             RefreshBrandList();
             txtValues.Text = "";
         }
 
+
+        // Parser les valeurs
         private static double[] ParseValues(string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return Array.Empty<double>();
+            if (string.IsNullOrWhiteSpace(input))
+                return Array.Empty<double>();
+
             var parts = input.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var list = new List<double>();
-            foreach (var p in parts)
+            var result = new List<double>();
+
+            foreach (var part in parts)
             {
-                if (double.TryParse(p.Replace(',', '.'), System.Globalization.NumberStyles.Any,
-                    System.Globalization.CultureInfo.InvariantCulture, out double v))
+                var cleaned = part.Replace(',', '.'); // Remplacer virgule par point
+                if (double.TryParse(cleaned, out double value))
                 {
-                    list.Add(v);
+                    result.Add(value);
                 }
             }
-            return list.ToArray();
+
+            return result.ToArray();
         }
+
 
         private bool _isResetting = false;
         
@@ -1265,10 +1249,10 @@ namespace ActionMarque
                 {
                     System.Diagnostics.Debug.WriteLine($"Granularité inchangée: {currentGranularity}");
                 }
-                
+
                 // TOUJOURS définir les limites de l'axe X en premier selon les règles spécifiées
-                var minDate = new DateTime(2020, 9, 24); // 24/09/2020 pour le début
-                var maxDate = new DateTime(2025, 9, 23); // 23/09/2025 pour la fin
+                var minDate = DateTime.Now.AddYears(-5);
+                var maxDate = DateTime.Now.AddDays(-1);
                 
                 chartArea.AxisX.Minimum = minDate.ToOADate();
                 chartArea.AxisX.Maximum = maxDate.ToOADate();
@@ -1487,37 +1471,38 @@ namespace ActionMarque
         }
 
         /// <summary>
-        /// Détermine la granularité appropriée selon le niveau de zoom
+        /// Détermine la granularité appropriée selon le niveau de zoom (Compatible C# 7.3)
         /// </summary>
         private DataGranularity DetermineGranularity(double zoomLevel)
         {
             if (zoomLevel <= 1.0)
-            {
-                return DataGranularity.Yearly; // Vue complète = données annuelles
-            }
-            else if (zoomLevel > 1.0 && zoomLevel <= 2.0)
-            {
-                return DataGranularity.Monthly; // Zoom moyen = données mensuelles
-            }
-            else
-            {
-                return DataGranularity.Daily; // Zoom fort = données journalières
-            }
+                return DataGranularity.Yearly;    // Vue complète = données annuelles
+            
+            if (zoomLevel <= 2.0)
+                return DataGranularity.Monthly;   // Zoom moyen = données mensuelles
+            
+            return DataGranularity.Daily;         // Zoom fort = données journalières
         }
         
         /// <summary>
-        /// Obtient le nom d'affichage de la granularité
+        /// Obtient le nom d'affichage de la granularité (Compatible C# 7.3)
         /// </summary>
         private string GetGranularityDisplayName(DataGranularity granularity)
         {
             switch (granularity)
             {
-                case DataGranularity.Yearly: return "Années";
-                case DataGranularity.Monthly: return "Mois";
-                case DataGranularity.Daily: return "Jours";
-                case DataGranularity.Weekly: return "Semaines";
-                case DataGranularity.Intraday: return "Heures";
-                default: return "Données";
+                case DataGranularity.Yearly:
+                    return "Années";
+                case DataGranularity.Monthly:
+                    return "Mois";
+                case DataGranularity.Daily:
+                    return "Jours";
+                case DataGranularity.Weekly:
+                    return "Semaines";
+                case DataGranularity.Intraday:
+                    return "Heures";
+                default:
+                    return "Données";
             }
         }
         
