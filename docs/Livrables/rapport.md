@@ -5,8 +5,8 @@ date: "Lausanne, Vennes – 32p "
 project_manager: "Melly Jonathan"
 ---
 
-<div style="background-color: #000000; color: #ffffff; text-align: center; padding: 30px; font-family: Arial, sans-serif;">
-<div style="background-color: #000000; color: #ffffff; padding: 20px; margin: 20px; border-radius: 8px;">
+<div style="color: #ffffff; text-align: center; padding: 30px; font-family: Arial, sans-serif;">
+<div style="color: #ffffff; padding: 20px; margin: 20px; border-radius: 8px;">
 </div>
 <div>
 <h2 style="font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 1px; color: #ffffff;">
@@ -52,9 +52,9 @@ ETML
 
 ---
 
-<h1 style="color: #ffffff; background-color: #000000; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
+<h1 style="color: #ffffff; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
 
-<h2 style="color: #ffffff; background-color: #000000; padding: 8px 0; margin: 15px 0;">1.1 Introduction</h2> 
+<h2 style="color: #ffffff;  padding: 8px 0; margin: 15px 0;">1.1 Introduction</h2> 
 ### Description
 Concevoir un logiciel permettant d’afficher et d’analyser des séries temporelles sous forme graphique.  
 L’utilisateur pourra importer des données externes (CSV, JSON, API) et comparer plusieurs jeux de données simultanément.  
@@ -68,7 +68,7 @@ L’utilisateur pourra importer des données externes (CSV, JSON, API) et compar
   - Roadmap
   - User stories
 - **Python**
-- **API : Alpha Vantage**
+- **API : Twelve Data**
 - **Figma**
 
 ## 1.4 Prérequis  
@@ -322,8 +322,8 @@ _A compléter_
 ## 5.1 Dossier des tests  
 
 ### Version de l'application testée : 1.0.0
-### Date du test : [À compléter]
-### Nom du testeur : [À compléter]
+### Date du test : A voir
+### Nom du testeur : Jonathan Melly
 
 ### **Scénario 1 : Ajout de marque**
 
@@ -332,7 +332,7 @@ _A compléter_
 | **Arrange / Given** | AjoutMarque - Cliquer sur le bouton ajouter qui est un logo de (+) | Interface utilisateur avec bouton d'ajout |
 | **Act / When** | Écrire le symbole ou le nom d'une marque à l'endroit prévu | Il est possible que l'API ne contienne pas toutes les marques et que le fichier .txt ne contienne pas toutes les conversions entre nom et symbole pour bien envoyer la requête à l'API |
 | **Assert / Then** | Affiche sur le graphique la ligne des données récoltées. Il doit être sur le panel de droite nom inscrit un checkbox pour l'afficher ou non. | Vérification de l'affichage graphique et de la gestion de la visibilité |
-| **Résultat** |[x] OK [] KO | |
+| **Résultat** |[x] OK [ ] KO | |
 | **Remarque** | | |
 
 ---
@@ -344,7 +344,7 @@ _A compléter_
 | **Arrange / Given** | Suppression d'une marque | Préparation de la suppression |
 | **Act / When** | Cliquer sur le bouton de la marque, elle se met dans la zone de texte | Sélection de la marque à supprimer |
 | **Assert / Then** | Quand je clique sur le bouton suppression à sa droite. La marque se supprime. | Vérification de la suppression effective |
-| **Résultat** | [x] OK ☐ KO | |
+| **Résultat** | [x] OK [ ] KO | |
 | **Remarque** | | |
 
 ---
@@ -356,20 +356,41 @@ _A compléter_
 | **Arrange / Given** | Calculer le Min, Max, Average de la marque | Préparation du calcul statistique |
 | **Act / When** | Quand je clique sur le bouton de la marque (le texte) | Sélection de la marque pour afficher ses statistiques |
 | **Assert / Then** | En bas à droite nous pouvons voir un texte s'afficher. Écrit : Min : …, Max : …, Avg : … | Vérification de l'affichage des statistiques |
-| **Résultat** | [x] OK ☐ KO | |
+| **Résultat** | [x] OK [ ] KO | |
 | **Remarque** | | |
 
 # 6. Usage de l'IA
-Je vais dire point par point comment j'ai utilisé l'IA dans ce projet. Pour commencer j'ai utilisé l'IA pour :
-- 1. Mon rapport : uniquement pour le visuel et pour m'aider à implémenter le style de l'ETML pour l'en-tête vu que je voulais créer un template markdown pour de futur projet.
-- 2. Mon code : Pour les extensions niveaux syntaxes qu 
+
+Dans ce projet, j'ai utilisé l'intelligence artificielle de manière ciblée pour m'assister dans différents aspects du développement. Voici un récapitulatif détaillé de mon utilisation :
+
+## 6.1 Rapport et documentation
+
+J'ai utilisé l'IA uniquement pour le visuel et pour m'aider à implémenter le style de l'ETML pour l'en-tête, car je voulais créer un template markdown pour de futurs projets. L'IA m'a permis de mettre en place un en-tête professionnel avec le style ETML, incluant le logo et la mise en forme appropriée.
+
+## 6.2 Développement du code
+
+Pour les extensions au niveau syntaxe des extensions, j'ai fait appel à l'IA car je ne savais pas comment les écrire proprement. L'IA m'a aidé à identifier quelles fonctionnalités d'extensions seraient utiles pour l'application, ce qui m'a permis d'implémenter des extensions C# fonctionnelles et bien structurées.
+
+## 6.3 Interface utilisateur (CSS)
+
+J'ai également utilisé l'IA pour le CSS de l'application afin qu'elle soit assez belle à utiliser et à regarder. L'IA m'a assisté dans la conception d'un design moderne et professionnel pour l'interface utilisateur. Cela incluait la sélection de couleurs harmonieuses, l'optimisation de la disposition des éléments, l'amélioration de l'expérience utilisateur globale et l'adaptation responsive des composants. 
+
 # 7. Conclusion
 
 ## 7.1 Bilan des fonctionnalités demandées  
-_A compléter_
+
+### Fonctionnalités implémentées :
+- Affichage de séries temporelles simultanées
+- Importation de données via API Twelve Data
+- Interface graphique avec gestion des marques (ajout/suppression)
+- Calcul et affichage des statistiques (Min, Max, Average)
+- Filtrage par dates (période 2020-2025)
+- Gestion multi-granularité des données
+- Parsing JSON robuste avec gestion d'erreurs
 
 ## 7.2 Bilan de la planification  
-_A compléter_
+
+J'ai essayé de suivre ma planification et de suivre ma vitesse de travail. Finalement, avec du travail supplémentaire à la maison, j'ai pu finir plus tôt le 1 octobre 2025. Les prochains moments de cours seront surtout pour peaufiner et corriger les erreurs émises par l'enseignant.
 
 ## 7.3 Bilan personnel  
 
