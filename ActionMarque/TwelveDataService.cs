@@ -73,9 +73,6 @@ namespace ActionMarque
                 
                 var response = await _httpClient.GetStringAsync(url);
                 
-                // Debug: afficher la réponse complète pour diagnostic
-                System.Diagnostics.Debug.WriteLine($"TwelveData Full Response for {symbol}: {response}");
-                
                 var serializer = new JavaScriptSerializer();
                 var jsonData = serializer.DeserializeObject(response) as Dictionary<string, object>;
 
@@ -94,7 +91,6 @@ namespace ActionMarque
 
                 // Vérifier les clés disponibles
                 var availableKeys = string.Join(", ", jsonData.Keys);
-                System.Diagnostics.Debug.WriteLine($"Available keys: {availableKeys}");
 
                 var values = jsonData["values"] as object[];
                 if (values == null)
@@ -104,69 +100,17 @@ namespace ActionMarque
                 }
 
                 var dataPoints = values
-            .OfType<Dictionary<string, object>>()           // S'assurer que chaque item est bien un dictionnaire
-            .Select(item =>
-            {
-                try
-                {
-                    if (!item.ContainsKey("datetime") || !item.ContainsKey("close"))
-                        return null;
-
-                    var dateStr = item["datetime"].ToString();
-                    var closePriceStr = item["close"].ToString();
-
-                    var dateParseSuccess = DateTime.TryParse(dateStr, out DateTime date);
-                    var priceParseSuccess = double.TryParse(
-                        closePriceStr,
-                        System.Globalization.NumberStyles.Float,
-                        System.Globalization.CultureInfo.InvariantCulture,
-                        out double closePrice
-                    );
-
-                    if (dateParseSuccess && priceParseSuccess && date >= startDate && date <= endDate)
-                    {
-                        return new StockDataPoint
-                        {
-                            Date = date,
-                            Price = closePrice
-                        };
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Erreur parsing item: {ex.Message}");
-                }
-
-                return null; // Filtrer les entrées invalides
-            })
-            .Where(dp => dp != null)   // Supprimer les null
-            .OrderBy(dp => dp.Date)    // Trier par date
+            .OfType<Dictionary<string, object>>()
+            .Select(item => ParseStockDataPoint(item, startDate, endDate))
+            .Filter(dp => dp != null)
+            .OrderBy(dp => dp.Date)
             .ToList();
 
-                // Trier par date (utiliser OrderBy pour être compatible LINQ)
-                var sortedDataPoints = dataPoints.OrderBy(x => x.Date).ToList();
-                
-                // DEBUG: Afficher les données avant extension
-                System.Diagnostics.Debug.WriteLine($"=== DEBUG API {symbol} - Données avant extension ===");
-                if (sortedDataPoints.Any())
-                {
-                    System.Diagnostics.Debug.WriteLine($"Nombre de points: {sortedDataPoints.Count}");
-                    System.Diagnostics.Debug.WriteLine($"Première date: {sortedDataPoints.First().Date:dd/MM/yyyy}");
-                    System.Diagnostics.Debug.WriteLine($"Dernière date: {sortedDataPoints.Last().Date:dd/MM/yyyy}");
-                }
-                
                 // Étendre les données jusqu'à la fin de la période si nécessaire
-                var extendedDataPoints = ExtendDataToFinalDate(sortedDataPoints, symbol);
-                
-                // DEBUG: Afficher les données après extension
-                System.Diagnostics.Debug.WriteLine($"=== DEBUG API {symbol} - Données après extension ===");
-                if (extendedDataPoints.Any())
-                {
-                    System.Diagnostics.Debug.WriteLine($"Nombre de points: {extendedDataPoints.Count}");
-                    System.Diagnostics.Debug.WriteLine($"Première date: {extendedDataPoints.First().Date:dd/MM/yyyy}");
-                    System.Diagnostics.Debug.WriteLine($"Dernière date: {extendedDataPoints.Last().Date:dd/MM/yyyy}");
-                }
-                System.Diagnostics.Debug.WriteLine($"=== FIN DEBUG API {symbol} ===\n");
+                var extendedDataPoints = dataPoints
+                    .Tap(dp => LogDataPoints(dp, symbol, "avant extension"))
+                    .Let(dp => ExtendDataToFinalDate(dp, symbol))
+                    .Tap(dp => LogDataPoints(dp, symbol, "après extension"));
                 
                 // Traitement selon la granularité demandée
                 switch (granularity)
@@ -233,11 +177,7 @@ namespace ActionMarque
         private List<StockDataPoint> AddYearToDataPoints(List<StockDataPoint> dataPoints)
         {
             return dataPoints
-                .Select(dp =>
-                {
-                    dp.Year = dp.Date.Year; // mettre à jour
-                    return dp;              // retourner l'objet modifié
-                })
+                .ForEachDo(dp => dp.Year = dp.Date.Year)
                 .ToList();
         }
 
@@ -251,30 +191,38 @@ namespace ActionMarque
                 try
                 {
                     var data = await GetStockDataAsync(symbol);
-
+                    
                     if (data != null && data.Count > 0)
                     {
-                        return new BrandData
+                        var brandData = new BrandData
                         {
                             Symbol = symbol,
                             Name = symbol,
                             DataPoints = data
                         };
+                        
+                        System.Diagnostics.Debug.WriteLine($"✅ Données chargées pour {symbol}: {data.Count} points");
+                        return brandData;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"❌ Aucune donnée pour {symbol}");
+                        return null;
                     }
                 }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Erreur pour {symbol}: {ex.Message}");
+                    return null;
                 }
-
-                return null; // Retourner null si pas de données ou erreur
             });
 
-            // Attendre que toutes les tâches se terminent
             var results = await Task.WhenAll(tasks);
-
-            // Filtrer les nulls et retourner la liste finale
-            return results.Where(b => b != null).ToList();
+            System.Diagnostics.Debug.WriteLine($"🏁 Chargement terminé pour {symbols.Length} symboles");
+            
+            return results
+                .Filter(b => b != null)
+                .ToList();
         }
 
 
@@ -343,38 +291,11 @@ namespace ActionMarque
                 // Créer les 4 tranches du mois
                 var slices = CreateMonthSlices(currentDate, monthEnd);
 
-                // Projection fonctionnelle
-                var slicePoints = slices.Select(slice =>
-                {
-                    var sliceData = dataPoints
-                        .Where(dp => dp.Date >= slice.Start && dp.Date <= slice.End)
-                        .ToList();
-
-                    if (sliceData.Count > 0)
-                    {
-                        return new StockDataPoint
-                        {
-                            Date = slice.End,
-                            Price = sliceData.Average(dp => dp.Price),
-                            Year = slice.End.Year
-                        };
-                    }
-                    else if (currentDate.Year >= 2025)
-                    {
-                        return new StockDataPoint
-                        {
-                            Date = slice.End,
-                            Price = lastKnownPrice,
-                            Year = slice.End.Year
-                        };
-                    }
-                    else
-                    {
-                        return null; // On filtre plus tard
-                    }
-                })
-                .Where(dp => dp != null)  // Supprime les périodes sans données (hors 2025+)
-                .ToList();
+                // Projection fonctionnelle avec extensions
+                var slicePoints = slices
+                    .Select(slice => CreateSliceDataPoint(slice, dataPoints, lastKnownPrice, currentDate.Year))
+                    .Filter(dp => dp != null)
+                    .ToList();
 
                 monthlySlices.AddRange(slicePoints);
 
@@ -465,38 +386,132 @@ namespace ActionMarque
                 lastKnownPrice = lastPoint.Price;
             }
 
-            // Pour chaque date de référence, trouver le prix correspondant
-            foreach (var refDate in referenceDates)
-            {
-                // Chercher le point le plus proche avant ou à cette date
-                var closestPoint = dataPoints
-                    .Where(dp => dp.Date <= refDate)
-                    .OrderByDescending(dp => dp.Date)
-                    .FirstOrDefault();
-
-                // Si on a trouvé un point, l'utiliser
-                if (closestPoint != null)
-                {
-                    yearlyPoints.Add(new StockDataPoint
-                    {
-                        Date = refDate,
-                        Price = closestPoint.Price,
-                        Year = refDate.Year
-                    });
-                }
-                // Pour les dates futures (2025), utiliser le dernier prix connu
-                else if (refDate.Year >= 2025 && lastKnownPrice > 0)
-                {
-                    yearlyPoints.Add(new StockDataPoint
-                    {
-                        Date = refDate,
-                        Price = lastKnownPrice,
-                        Year = refDate.Year
-                    });
-                }
-            }
+            // Pour chaque date de référence, trouver le prix correspondant avec extensions
+            referenceDates
+                .Select(refDate => CreateYearlyDataPoint(refDate, dataPoints, lastKnownPrice))
+                .Filter(dp => dp != null)
+                .ForEachDo(dp => yearlyPoints.Add(dp));
 
             return yearlyPoints;
+        }
+
+        /// <summary>
+        /// Helper pour parser un point de données depuis un dictionnaire
+        /// </summary>
+        private StockDataPoint ParseStockDataPoint(Dictionary<string, object> item, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                if (!item.ContainsKey("datetime") || !item.ContainsKey("close"))
+                    return null;
+
+                var dateStr = item["datetime"].ToString();
+                var closePriceStr = item["close"].ToString();
+
+                var dateParseSuccess = DateTime.TryParse(dateStr, out DateTime date);
+                var priceParseSuccess = double.TryParse(
+                    closePriceStr,
+                    System.Globalization.NumberStyles.Float, // autorise notations décimales/scientifiques et règle l'erreur si espace blanc " 204.24"
+                    System.Globalization.CultureInfo.InvariantCulture, // évite les problèmes de séparateur décimal (,/.)
+                    out double closePrice
+                );
+
+                if (dateParseSuccess && priceParseSuccess && date >= startDate && date <= endDate)
+                {
+                    return new StockDataPoint
+                    {
+                        Date = date,
+                        Price = closePrice
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur parsing item: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Helper pour logger les points de données
+        /// </summary>
+        private void LogDataPoints(List<StockDataPoint> dataPoints, string symbol, string phase)
+        {
+            System.Diagnostics.Debug.WriteLine($"=== DEBUG API {symbol} - Données {phase} ===");
+            if (dataPoints.Any())
+            {
+                System.Diagnostics.Debug.WriteLine($"Nombre de points: {dataPoints.Count}");
+                System.Diagnostics.Debug.WriteLine($"Première date: {dataPoints.First().Date:dd/MM/yyyy}");
+                System.Diagnostics.Debug.WriteLine($"Dernière date: {dataPoints.Last().Date:dd/MM/yyyy}");
+            }
+            System.Diagnostics.Debug.WriteLine($"=== FIN DEBUG API {symbol} ===\n");
+        }
+
+        /// <summary>
+        /// Helper pour créer un point de données pour une tranche mensuelle
+        /// </summary>
+        private StockDataPoint CreateSliceDataPoint((DateTime Start, DateTime End) slice, List<StockDataPoint> dataPoints, double lastKnownPrice, int currentYear)
+        {
+            var sliceData = dataPoints
+                .Where(dp => dp.Date >= slice.Start && dp.Date <= slice.End)
+                .ToList();
+
+            if (sliceData.Count > 0)
+            {
+                return new StockDataPoint
+                {
+                    Date = slice.End,
+                    Price = sliceData.Average(dp => dp.Price),
+                    Year = slice.End.Year
+                };
+            }
+            else if (currentYear >= 2025)
+            {
+                return new StockDataPoint
+                {
+                    Date = slice.End,
+                    Price = lastKnownPrice,
+                    Year = slice.End.Year
+                };
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Helper pour créer un point de données annuel
+        /// </summary>
+        private StockDataPoint CreateYearlyDataPoint(DateTime refDate, List<StockDataPoint> dataPoints, double lastKnownPrice)
+        {
+            // Chercher le point le plus proche avant ou à cette date
+            var closestPoint = dataPoints
+                .Where(dp => dp.Date <= refDate)
+                .OrderByDescending(dp => dp.Date)
+                .FirstOrDefault();
+
+            // Si on a trouvé un point, l'utiliser
+            if (closestPoint != null)
+            {
+                return new StockDataPoint
+                {
+                    Date = refDate,
+                    Price = closestPoint.Price,
+                    Year = refDate.Year
+                };
+            }
+            // Pour les dates futures (2025), utiliser le dernier prix connu
+            else if (refDate.Year >= 2025 && lastKnownPrice > 0)
+            {
+                return new StockDataPoint
+                {
+                    Date = refDate,
+                    Price = lastKnownPrice,
+                    Year = refDate.Year
+                };
+            }
+
+            return null;
         }
     }
 

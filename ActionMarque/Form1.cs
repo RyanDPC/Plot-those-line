@@ -1011,18 +1011,22 @@ namespace ActionMarque
                     var prices = data.Select(dp => dp.Price).ToArray();
                     AddBrandSeriesWithDates(displayName, prices, data);
                     
-                    
-                    MessageBox.Show($"Marque ajoutée: {displayName.ToUpper()}");
+                    MessageBox.Show($"✅ Marque ajoutée: {displayName.ToUpper()}", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Aucune donnée API, utilisation des valeurs manuelles");
+                    System.Diagnostics.Debug.WriteLine("Aucune donnée API, vérification des valeurs manuelles");
                     var parsed = ParseValues(input);
                     if (parsed.Length > 0)
                     {
                         AddBrandSeries(displayName, parsed);
                         brands.Add(new BrandItem { Name = displayName, Values = parsed });
-                        
+                        MessageBox.Show($"✅ Marque ajoutée (valeurs manuelles): {displayName.ToUpper()}", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        // La marque n'est trouvée ni dans l'API ni dans les valeurs manuelles
+                        MessageBox.Show($"{input.ToUpper()}\n\nCette marque n'existe pas dans l'API Twelve Data ni dans le fichier marques.txt.\nVérifiez l'orthographe du symbole boursier.","", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
 
@@ -1089,21 +1093,10 @@ namespace ActionMarque
 
             var parts = input.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var result = parts.Select(s => double.TryParse(s.Replace(",", "."), out double value) ? (double?)value :null)
-                .Where(part => part.HasValue)
+                .Filter(part => part.HasValue)
                 .Select(part => part.Value)
-                .ToList();
-            
-            //parts.Select(s => s.Replace(',', '.').Where(double.TryParse(s, out double value));
-            foreach (var part in parts)
-            {
-                var cleaned = part.Replace(',', '.'); // Remplacer virgule par point
-                if (double.TryParse(cleaned, out double value))
-                {
-                    result.Add(value);
-                }
-            }
-
-            return result.ToArray();
+                .ToArray();
+            return result;
         }
 
 
@@ -1640,7 +1633,7 @@ namespace ActionMarque
                 switch (granularity)
                 {
                     case DataGranularity.Yearly:
-                        // Configuration simple pour afficher les années uniquement
+                        // Configuration pour afficher les années uniquement
                         axisX.LabelStyle.Format = "yyyy";
                         axisX.Interval = 1;
                         axisX.IntervalType = DateTimeIntervalType.Years;
@@ -1831,9 +1824,7 @@ namespace ActionMarque
                     customLabel.ForeColor = Color.Yellow; // Couleur différente pour les années
                     customLabel.RowIndex = 1; // Mettre les années sur une ligne séparée
                     chartArea.AxisX.CustomLabels.Add(customLabel);
-                }
-                
-                System.Diagnostics.Debug.WriteLine("Labels personnalisés configurés pour l'axe X");
+                }    
             }
             catch (Exception ex)
             {

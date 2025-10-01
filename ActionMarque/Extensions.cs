@@ -34,7 +34,7 @@ namespace ActionMarque
         }
 
         /// <summary>
-        /// Extension pour observer une valeur (utile pour debug)
+        /// Extension pour observer une valeur
         /// </summary>
         public static T Tap<T>(this T obj, Action<T> action)
         {
