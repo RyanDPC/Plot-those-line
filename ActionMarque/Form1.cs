@@ -145,9 +145,9 @@ namespace ActionMarque
             chartArea.AxisY.MajorGrid.LineColor = Color.Gray;
             chartArea.AxisY.LabelStyle.ForeColor = Color.White;
             chartArea.AxisY.LineColor = Color.White;
-            chartArea.AxisY.Title = "Prix ($)";
+            chartArea.AxisY.Title = "Cours de l'action (USD)";
             chartArea.AxisY.TitleForeColor = Color.White;
-            chartArea.AxisY.LabelStyle.Format = "#,0";
+            chartArea.AxisY.LabelStyle.Format = "#,0.00";
             
             // Définir les limites de l'axe X (copiée du test qui fonctionne)
             var minDate = new DateTime(2020, 9, 24);
@@ -442,7 +442,9 @@ namespace ActionMarque
             try
             {
                 // Supprimer l'existante si elle existe
-                chart.Series.FindByName(name)?.Let(existing => chart.Series.Remove(existing));
+                var existing = chart.Series.FindByName(name);
+                if (existing != null)
+                    chart.Series.Remove(existing);
 
                 var s = new Series(name)
                 {
@@ -1063,7 +1065,7 @@ namespace ActionMarque
             var max = values.Max();
             var avg = values.Average();
 
-            lblStats.Text = $"Min: {min:F2}$  Max: {max:F2}$  Avg: {avg:F2}$";
+            lblStats.Text = $"Min: {min:F2} USD  |  Max: {max:F2} USD  |  Moy: {avg:F2} USD";
         }
 
         // Suppression simple et lisible d'une marque

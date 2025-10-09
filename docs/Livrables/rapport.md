@@ -28,8 +28,10 @@ ETML
 
 # Table des matières
 - [1. Spécifications](#1-spécifications)
-  - [1.1 Titre](#11-titre)
-    - [Description](#12-description)
+  - [1.1 Introduction](#11-introduction)
+    - [1.1.1 Description du domaine](#111-description-du-domaine)
+    - [1.1.2 Description du projet](#112-description-du-projet)
+    - [1.1.3 Objectifs pédagogiques](#113-objectifs-pédagogiques)
   - [1.3 Matériel et logiciels à disposition](#13-matériel-et-logiciels-à-disposition)
   - [1.4 Prérequis](#14-prérequis)
   - [1.5 Cahier des charges](#15-cahier-des-charges)
@@ -43,21 +45,90 @@ ETML
   - [1.6 Points évalués](#16-points-évalués)
   - [1.7 Validation et conditions de réussite](#17-validation-et-conditions-de-réussite)
 - [2. Planification Initiale](#2-planification-initiale)
+  - [2.1 Méthodologie de projet](#21-méthodologie-de-projet)
+  - [2.4 Suivi et contrôle](#24-suivi-et-contrôle)
 - [3. Analyse](#3-analyse)
+  - [3.1 Explication API](#31-explication-api)
+  - [3.2 Gestion de l'API](#32-gestion-de-lapi)
+  - [3.3 Conception des tests](#33-conception-des-tests)
+  - [3.4 Affichage graphique (Code)](#34-affichage-graphique-code)
 - [4. Réalisation](#4-réalisation)
+  - [4.1 Dossier de réalisation](#41-dossier-de-réalisation)
+    - [4.1.1 Architecture du projet](#411-architecture-du-projet)
+    - [4.1.2 Fonctionnalités implémentées](#412-fonctionnalités-implémentées)
+  - [4.2 Modifications](#42-modifications)
 - [5. Tests](#5-tests)
-- [6. Conclusion](#6-conclusion)
-- [7. Divers](#7-divers)
-- [8. Annexes](#8-annexes)
+  - [5.1 Dossier des tests](#51-dossier-des-tests)
+- [6. Usage de l'IA](#6-usage-de-lia)
+  - [6.1 Rapport et documentation](#61-rapport-et-documentation)
+  - [6.2 Développement du code](#62-développement-du-code)
+  - [6.3 Interface utilisateur (CSS)](#63-interface-utilisateur-css)
+- [7. Conclusion](#7-conclusion)
+  - [7.1 Bilan des fonctionnalités demandées](#71-bilan-des-fonctionnalités-demandées)
+  - [7.2 Bilan de la planification](#72-bilan-de-la-planification)
+  - [7.3 Bilan personnel](#73-bilan-personnel)
+- [8. Divers](#8-divers)
+  - [8.1 Journal de travail](#81-journal-de-travail)
 
 ---
 
 <h1 style="color: #ffffff; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
 
 <h2 style="color: #ffffff;  padding: 8px 0; margin: 15px 0;">1.1 Introduction</h2> 
-### Description
-Concevoir un logiciel permettant d’afficher et d’analyser des séries temporelles sous forme graphique.  
-L’utilisateur pourra importer des données externes (CSV, JSON, API) et comparer plusieurs jeux de données simultanément.  
+
+### 1.1.1 Description du domaine
+
+Ce projet s'inscrit dans le **domaine de la visualisation de données financières et temporelles**. Il vise à fournir un outil d'analyse graphique pour suivre l'évolution des valeurs boursières de différentes entreprises.
+
+**Contexte métier :**
+- **Analyse financière** : Suivi des cours d'actions en temps réel via l'API Twelve Data
+- **Comparaison de performances** : Visualisation simultanée de plusieurs entreprises (Tesla, Apple, Microsoft, etc.)
+- **Analyse temporelle** : Étude de l'évolution des prix sur différentes périodes (2020-2025)
+- **Données boursières** : Prix d'ouverture, fermeture, plus haut, plus bas, volume d'échanges
+
+**Applications concrètes :**
+- Investisseurs souhaitant comparer les performances de différentes actions
+- Analystes financiers étudiant les tendances du marché
+- Étudiants en finance découvrant les marchés boursiers
+- Traders recherchant des opportunités d'investissement
+
+### 1.1.2 Description du projet
+Concevoir un logiciel permettant d'afficher et d'analyser des séries temporelles sous forme graphique.  
+L'utilisateur pourra importer des données externes (CSV, JSON, API) et comparer plusieurs jeux de données simultanément.
+
+### 1.1.3 Objectifs pédagogiques
+
+Ce projet a pour but de développer les compétences suivantes :
+
+**1. Programmation fonctionnelle (ICT-323)**
+- Utilisation exclusive de **LINQ** (pas de boucles `for`)
+- Implémentation d'**extensions C#** personnalisées (`Filter`, `ForEachDo`)
+- Application des concepts de programmation fonctionnelle (immutabilité, fonctions pures)
+- Manipulation de collections avec les méthodes LINQ (`Select`, `Where`, `OrderBy`, etc.)
+
+**2. Consommation d'API REST**
+- Intégration de l'API **Twelve Data** pour récupérer des données boursières
+- Utilisation de **HttpClient** pour effectuer des requêtes HTTP
+- Parsing de réponses **JSON** avec `Newtonsoft.Json`
+- Gestion des erreurs et des limites de l'API (quotas de requêtes)
+
+**3. Visualisation de données**
+- Utilisation de la librairie **Chart** de Windows Forms
+- Affichage de graphiques linéaires avec plusieurs séries
+- Gestion de l'axe temporel (dates) et de l'axe des valeurs (prix)
+- Implémentation de fonctionnalités interactives (zoom, filtres, statistiques)
+
+**4. Gestion de projet**
+- Utilisation de **GitHub** pour le versioning et la gestion de projet
+- Rédaction d'un **journal de travail** régulier
+- Création de **User Stories** avec tests d'acceptance
+- Planification et suivi de l'avancement du projet
+
+**5. Architecture logicielle**
+- Séparation des responsabilités (Service API, Interface utilisateur)
+- Gestion de l'état de l'application (marques, données, zoom)
+- Optimisation des performances (cache, chargement asynchrone)
+- Tests unitaires pour valider les fonctionnalités critiques  
 
 ## 1.3 Matériel et logiciels à disposition  
 
@@ -263,8 +334,21 @@ L'API Twelve Data retourne les données au format JSON avec la structure suivant
 
 Ces données Twelve Data sont ensuite traitées pour générer les graphiques :
 
+- **Close (Prix de clôture)** : Valeur principale affichée sur le graphique (axe Y)
 - **High/Low** : Pour visualiser la volatilité (Average = Moyenne)
 - **DateTime** : Axe temporel (X) du graphique
+
+**Clarification des valeurs affichées :**
+
+L'axe Y du graphique représente le **cours de l'action en USD (dollars américains)**. Il s'agit du prix de clôture quotidien de l'action, c'est-à-dire le dernier prix auquel l'action a été échangée lors de la fermeture du marché boursier.
+
+**Exemple de lecture :**
+- Si le graphique affiche "425.85 USD" pour Tesla le 23/09/2025, cela signifie qu'une action Tesla coûtait 425,85 dollars américains à la clôture du marché ce jour-là.
+
+**Statistiques affichées :**
+- **Min** : Prix de clôture le plus bas sur la période affichée
+- **Max** : Prix de clôture le plus haut sur la période affichée  
+- **Moy (Moyenne)** : Prix de clôture moyen sur la période affichée
 
 ---
 

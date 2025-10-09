@@ -107,10 +107,9 @@ namespace ActionMarque
             .ToList();
 
                 // Étendre les données jusqu'à la fin de la période si nécessaire
-                var extendedDataPoints = dataPoints
-                    .Tap(dp => LogDataPoints(dp, symbol, "avant extension"))
-                    .Let(dp => ExtendDataToFinalDate(dp, symbol))
-                    .Tap(dp => LogDataPoints(dp, symbol, "après extension"));
+                LogDataPoints(dataPoints, symbol, "avant extension");
+                var extendedDataPoints = ExtendDataToFinalDate(dataPoints, symbol);
+                LogDataPoints(extendedDataPoints, symbol, "après extension");
                 
                 // Traitement selon la granularité demandée
                 switch (granularity)
