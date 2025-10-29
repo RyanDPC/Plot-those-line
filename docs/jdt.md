@@ -1,10 +1,37 @@
 # Journal de Travail (JDT)
-*Généré le 2025-09-24*
+*Généré le 2025-10-29*
+
+---
+
+## Semaine 44 (2025-10-27 → 2025-11-02, 2025)
+
+- **2025-10-29** [`3785eb5`] (Δ 2m) : fix(): reorder the tree
+- **2025-10-29** [`3c51e67`] : feat(): finish projet
+
+---
+
+## Semaine 41 (2025-10-06 → 2025-10-12, 2025)
+
+- **2025-10-09** [`3528a69`] : Nettoyage des extensions et suppression des fichiers de test
+
+---
+
+## Semaine 40 (2025-09-29 → 2025-10-05, 2025)
+
+- **2025-10-01** [`3a742c6`] (Δ 2h 7m) : feat() : finish the rapport and need to finalize after when the teacher pass for see where i need to change code or an element in the project
+- **2025-10-01** [`75918e5`] (Δ 43m) : feat(): completed the point 5 in the rapport so its unit Test
+- **2025-10-01** [`d56f46e`] (Δ 19m) : Add Action unit test project to solution
+- **2025-10-01** [`223e1c8`] (Δ 22m) : Refactor data parsing and messaging logic
+- **2025-10-01** [`5dbacb6`] (Δ 42m) : Refactor Form1 error handling and parsing logic
+- **2025-10-01** [`34da64f`] (Δ 55m) : Add extension methods and refactor Form1 logic
+- **2025-10-01** [`954daa6`] (Δ 5m) : Modernize UI styles and improve panel layout
+- **2025-10-01** [`d7f3d78`] : Refactor filter panel and sorting logic in Form1
 
 ---
 
 ## Semaine 39 (2025-09-22 → 2025-09-28, 2025)
 
+- **2025-09-24** [`6826e45`] (Δ 2m) : Update jdt.md with Semaine 39 changelog
 - **2025-09-24** [`3e11949`] (Δ 1m) : Refactor series addition and UI layout in Form1.cs
 - **2025-09-24** [`06d25a4`] : Add zoom and filter features to chart UI
 
