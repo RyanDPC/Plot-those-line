@@ -406,39 +406,112 @@ Plot-those-line/
 ### Date du test : 8 Octobre 2025
 ### Nom du testeur : Ryan De Pina
 
-### **Scénario 1 : Ajout de marque**
+### Scénario 1
 
-| Étape | Description | Remarque |
-|-------|-------------|----------|
-| **Arrange / Given** | AjoutMarque - Cliquer sur le bouton ajouter qui est un logo de (+) | Interface utilisateur avec bouton d'ajout |
-| **Act / When** | Écrire le symbole ou le nom d'une marque à l'endroit prévu | Il est possible que l'API ne contienne pas toutes les marques et que le fichier .txt ne contienne pas toutes les conversions entre nom et symbole pour bien envoyer la requête à l'API |
-| **Assert / Then** | Affiche sur le graphique la ligne des données récoltées. Il doit être sur le panel de droite nom inscrit un checkbox pour l'afficher ou non. | Vérification de l'affichage graphique et de la gestion de la visibilité |
-| **Résultat** |[x] OK [ ] KO | |
-| **Remarque** | | |
+**📝 Description**
+
+**En tant que**
+utilisateur voulant comprendre les relations entre données
+
+**Je souhaite**
+comparer des séries différentes comme le prix et le temps
+
+**Pour**
+voir si les variations de prix sont liées au temps mis dans le de marché
+
+**📌 Tests d'acceptance**
+
+**Test validé**
+
+**Contexte** : L'utilisateur charge les données de prix et temps.
+
+**Action** : Il les affiche sur un même graphique avec deux axes.
+
+**Résultat attendu** : Les deux séries sont visibles avec un axe pour chaque.
+
+
+**Test validé**
+
+**Contexte** : L'utilisateur filtre une période.
+
+**Action** : Il vérifie la cohérence des données affichées.
+
+**Résultat attendu** : Les données restent synchronisées et claires.
 
 ---
 
-### **Scénario 2 : Suppression de marque**
+### Scénario 2
 
-| Étape | Description | Remarque |
-|-------|-------------|----------|
-| **Arrange / Given** | Suppression d'une marque | Préparation de la suppression |
-| **Act / When** | Cliquer sur le bouton de la marque, elle se met dans la zone de texte | Sélection de la marque à supprimer |
-| **Assert / Then** | Quand je clique sur le bouton suppression à sa droite. La marque se supprime. | Vérification de la suppression effective |
-| **Résultat** | [x] OK [ ] KO | |
-| **Remarque** | | |
+**📝 Description**
+
+**En tant que**
+Un analyste de données dans une grande entreprise
+
+**Je souhaite**
+Afficher plusieurs séries temporelles simultanément (par exemple, l'évolution des actions de plusieurs entreprises sur une période donnée)
+
+**Pour**
+Comparer l’évolution de différentes actions ou données financières sur la même période, facilitant ainsi les décisions stratégiques basées sur les tendances du marché.
+
+**📌 Tests d'acceptance**
+
+**Test validé**
+
+**Contexte** : L'analyste a téléchargé des données boursières pour différentes entreprises (par exemple, Tesla, Apple, Microsoft).
+
+**Action** : L'analyste sélectionne les séries temporelles correspondant aux actions de ces entreprises sur les 5 dernières années.
+
+**Résultat attendu** : Une représentation graphique s'affiche avec toutes les séries temporelles superposées, permettant une comparaison facile entre les entreprises.
 
 ---
 
-### **Scénario 3 : Calcul des statistiques**
+### Scénario 3
 
-| Étape | Description | Remarque |
-|-------|-------------|----------|
-| **Arrange / Given** | Calculer le Min, Max, Average de la marque | Préparation du calcul statistique |
-| **Act / When** | Quand je clique sur le bouton de la marque (le texte) | Sélection de la marque pour afficher ses statistiques |
-| **Assert / Then** | En bas à droite nous pouvons voir un texte s'afficher. Écrit : Min : …, Max : …, Avg : … | Vérification de l'affichage des statistiques |
-| **Résultat** | [x] OK [ ] KO | |
-| **Remarque** | | |
+**📝 Description**
+
+**En tant que**
+Un analyste de données dans une entreprise financière
+
+**Je souhaite**
+Bénéficier d’une flexibilité d’affichage, notamment pouvoir zoomer ou filtrer mes séries temporelles en fonction de la granularité souhaitée (ex: vue annuelle, mensuelle, hebdomadaire)
+
+**Pour**
+Analyser mes données en détail, détecter des anomalies ou des tendances cachées, et avoir une meilleure compréhension du comportement du marché.
+
+**📌 Tests d'acceptance**
+
+**Test validé**
+
+**Contexte** : L'analyste a sélectionné une série temporelle représentant l'évolution du prix de l'action Apple sur les 10 dernières années.
+
+**Action** : L'analyste applique un zoom sur les 2 dernières années et filtre les données pour afficher une vue mensuelle.
+
+**Résultat attendu** : L'affichage se met à jour pour montrer uniquement les données mensuelles sur les 2 dernières années.
+
+---
+
+### Scénario 4
+
+**📝 Description**
+
+**En tant que**
+Un data engineer dans une grande entreprise technologique
+
+**Je souhaite**
+Importer de manière permanente des séries de données provenant de diverses sources (CSV, JSON, API) dans l'application
+
+**Pour**
+Assurer une mise à jour continue des données boursières de plusieurs entreprises et les rendre disponibles pour les analyses en temps réel.
+
+**📌 Tests d'acceptance**
+
+**Test validé**
+
+**Contexte** : Le data engineer souhaite importer les données boursières des actions de Google depuis une API prise avec Twelve Data.
+
+**Action** : Ecrire l'entreprise voulue sur la zone de texte.
+
+**Résultat attendu** : Si l'entreprise est sur l'API, les séries temporelles sont visibles dans l'application avec les bonnes valeurs.
 
 ---
 # 6. Usage de l'IA
