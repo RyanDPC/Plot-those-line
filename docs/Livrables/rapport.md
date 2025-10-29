@@ -21,7 +21,7 @@ Plot-Those-Line
 ETML
 </div>
 <div style="font-size: 16px; color: #ffffff; font-style: italic; font-family: cursive;">
-<img src="../../script/docs/image.png" alt="Logo ETML" style="height: 40px; margin: 0 20px;">
+<img src="../../docs/images/header.png" alt="Logo ETML" style="height: 40px; margin: 0 20px;">
 </div>
 </div>
 <div style="width: 100%; height: 2px; margin-top: -20px; background-color: #ffffff;"></div>
