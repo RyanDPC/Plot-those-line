@@ -650,17 +650,16 @@ namespace ActionMarque
             return panel;
         }
 
-        // Style fonctionnel : compatible C# 7.3
         private Color GetStatusColor(string status)
         {
             switch (status)
             {
                 case "positive":
-                    return Color.FromArgb(52, 199, 89);   // Vert moderne iOS
+                    return Color.FromArgb(52, 199, 89);   // Vert moderne
                 case "negative":
-                    return Color.FromArgb(255, 59, 48);   // Rouge moderne iOS
-                default:
-                    return Color.FromArgb(142, 142, 147); // Gris moderne iOS
+                    return Color.FromArgb(255, 59, 48);   // Rouge moderne
+                default
+                    return Color.FromArgb(142, 142, 147); // Gris moderne
             }
         }
 
@@ -1214,7 +1213,7 @@ namespace ActionMarque
         }
         
         /// <summary>
-        /// Applique un niveau de zoom sur le point visé par la souris (comme ScottPlot)
+        /// Applique un niveau de zoom sur le point visé par la souris
         /// </summary>
         private async void ApplyZoomLevelAtCursor(double zoomLevel, Point cursorLocation)
         {

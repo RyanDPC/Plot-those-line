@@ -353,10 +353,13 @@ L'axe Y du graphique représente le **cours de l'action en USD (dollars américa
 ---
 
 ## 3.3 Conception des tests  
-_A compléter_
 
-## 3.4 Affichage graphique (Code) 
-_A compléter_
+j'ai fait un projet annexe qui contient MTest, et qui est en réference avec mon projet principal. Il contient des tests d'acceptence.
+  - [5.1 Dossier des tests](#51-dossier-des-tests)
+
+## 3.4 Affichage graphique (Code)
+<img src="../../docs/images/Marque.png" width="1000"></img>
+<img src="../../docs/images/carbon.png" width="490"></img>
 
 ---
 
@@ -395,19 +398,13 @@ Plot-those-line/
 | **Documentation automatisée** | ✅ Terminé | Scripts Python/Batch | - |
 
 ---
-
-## 4.2 Modifications  
-_A compléter_
-
----
-
 # 5. Tests
 
 ## 5.1 Dossier des tests  
 
 ### Version de l'application testée : 1.0.0
-### Date du test : A voir
-### Nom du testeur : Jonathan Melly
+### Date du test : 8 Octobre 2025
+### Nom du testeur : Ryan De Pina
 
 ### **Scénario 1 : Ajout de marque**
 
@@ -443,6 +440,7 @@ _A compléter_
 | **Résultat** | [x] OK [ ] KO | |
 | **Remarque** | | |
 
+---
 # 6. Usage de l'IA
 
 Dans ce projet, j'ai utilisé l'intelligence artificielle de manière ciblée pour m'assister dans différents aspects du développement. Voici un récapitulatif détaillé de mon utilisation :
