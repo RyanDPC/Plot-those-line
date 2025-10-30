@@ -9,7 +9,9 @@ REM Paths
 set "INPUT_MD=%REPO_ROOT%\docs\Livrables\rapport.md"
 set "OUTPUT_PDF=%REPO_ROOT%\docs\Livrables\rapport.pdf"
 set "HEADER_TEX=%REPO_ROOT%\docs\pandoc\header.tex"
-set "RESOURCE_PATH=%REPO_ROOT%"
+REM Build a rich resource path so Pandoc can resolve images from Markdown location
+for %%I in ("%INPUT_MD%") do set "INPUT_DIR=%%~dpI"
+set "RESOURCE_PATH=%REPO_ROOT%;%REPO_ROOT%\docs;%REPO_ROOT%\docs\images;%REPO_ROOT%\docs\Livrables;%INPUT_DIR%"
 
 REM Check pandoc availability
 where pandoc >nul 2>nul
@@ -38,8 +40,9 @@ echo Generation du PDF...
 echo Entree : %INPUT_MD%
 echo Sortie : %OUTPUT_PDF%
 echo Header : %HEADER_TEX%
+echo Ressources : %RESOURCE_PATH%
 
-pandoc "%INPUT_MD%" -o "%OUTPUT_PDF%" --from markdown+yaml_metadata_block --pdf-engine=xelatex --include-in-header="%HEADER_TEX%" --resource-path="%RESOURCE_PATH%"
+pandoc "%INPUT_MD%" -o "%OUTPUT_PDF%" --from markdown+yaml_metadata_block+link_attributes+implicit_figures+raw_html+raw_tex --pdf-engine=xelatex --include-in-header="%HEADER_TEX%" --resource-path="%RESOURCE_PATH%"
 if errorlevel 1 (
   echo [ERREUR] Pandoc a renvoye un code d'erreur.
   exit /b 1

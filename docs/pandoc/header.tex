@@ -2,6 +2,34 @@
 % Logo à droite (sauf page de garde où il est centré), pas de titre centré, numéro page en footer
 
 \usepackage{graphicx}
+% Set document fonts (XeLaTeX)
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Consolas}
+\usepackage{titlesec}
+\usepackage{float} % allow [H] placement
+\usepackage{tocloft} % control ToC fonts
+
+% ToC typography: use main serif font (Times) and larger title
+\renewcommand{\cfttoctitlefont}{\Large\bfseries}
+\renewcommand{\cftsecfont}{\normalsize\rmfamily}
+\renewcommand{\cftsecpagefont}{\normalsize\rmfamily}
+\renewcommand{\cftsubsecfont}{\normalsize\rmfamily}
+\renewcommand{\cftsubsecpagefont}{\normalsize\rmfamily}
+% Enlarge headings
+\titleformat{\section}{\Large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+% Try several likely relative paths for images regardless of working directory
+\graphicspath{{../images/}{images/}{docs/images/}{../docs/images/}}
+\usepackage{etoolbox}
+
+% Ensure ToC uses normal pagestyle and is followed by a page break
+\pretocmd{\tableofcontents}{\thispagestyle{normal}}{}{}
+\apptocmd{\tableofcontents}{\newpage}{}{}
+
+% Ensure a page break after the title page without needing LaTeX in Markdown
+\apptocmd{\maketitle}{\thispagestyle{plain}\newpage}{}{}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
 \usepackage{geometry}
@@ -13,7 +41,7 @@
 % Style "normal" : header avec logo à droite, trait, footer numéro de page centré
 \fancypagestyle{normal}{%
   \fancyhf{}
-  \fancyhead[R]{\includegraphics[height=1.5cm]{C:/Users/pa70iyc/Documents/GitHub/Plot-those-line/docs/images/header.png}}
+  \fancyhead[R]{\includegraphics[height=1.0cm]{header.png}}
   \renewcommand{\headrulewidth}{0.4pt}
   \fancyfoot[C]{\thepage{} / \pageref{LastPage}}
 }

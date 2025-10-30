@@ -3,20 +3,12 @@ title: "Rapport de Projet"
 author: "De Pina Correia Ryan – CID3A"
 date: "Lausanne, Vennes – 32p "
 project_manager: "Melly Jonathan"
+toc: true
+toc-depth: 3
+toc-title: "Table des matières"
 ---
 
 <!-- PAGE DE GARDE -->
-
-# Rapport de Projet
-
-De Pina Correia Ryan -- CID3A  
-Lausanne, Vennes -- 32p  
-
-RAPPORT DE PROJET  
-Plot-Those-Line  
-ETML
-
-\newpage
 
 <!--
 # Table des matières
@@ -64,13 +56,12 @@ ETML
 - [8. Divers](#8-divers)
     - [8.1 Journal de travail](#81-journal-de-travail)
 -->
-
-\tableofcontents
+```{=latex}
 \newpage
+```
+# 1. Spécification
 
-<h1 style="color: #ffffff; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
-
-<h2 style="color: #ffffff;  padding: 8px 0; margin: 15px 0;">1.1 Introduction</h2> 
+## 1.1 Introduction
 
 ### 1.1.1 Description du domaine
 
@@ -262,14 +253,14 @@ Dans tous les cas, les points suivants doivent être respectés :
   - **Repository :** [Plot-those-line](https://github.com/RyanDPC/Plot-those-line)
   - **Issues & Roadmap :** Suivi des tâches et bugs
 - **Durée totale :** 32 périodes
-- **Suivi :** Journal de travail détaillé → [📋 Consulter le JDT](../jdt.md)
+- **Suivi :** Journal de travail détaillé → [Consulter le JDT](../jdt.md)
 
 ## 2.4 Suivi et contrôle
 - **GitHub Project Board :** [Tableau de bord Project #4](https://github.com/users/RyanDPC/projects/4)
-  - 📋 **Backlog** : User Stories en attente
-  - 🔄 **In Progress** : Tâches en cours de développement  
-  - ✅ **Done** : Fonctionnalités terminées et testées
-- **Journal de travail quotidien :** [📋 JDT détaillé](../jdt.md)
+  - **Backlog** : User Stories en attente
+  - **In Progress** : Tâches en cours de développement  
+  - **Done** : Fonctionnalités terminées et testées
+- **Journal de travail quotidien :** [JDT détaillé](../jdt.md)
 - **Issues GitHub :** Suivi des bugs et améliorations
 - **Commits réguliers :** Messages explicites et atomiques
 - **Points réguliers** avec le chef de projet
@@ -354,8 +345,22 @@ j'ai fait un projet annexe qui contient MTest, et qui est en réference avec mon
   - [5.1 Dossier des tests](#51-dossier-des-tests)
 
 ## 3.4 Affichage graphique (Code)
-<img src="../../docs/images/Marque.png" width="1000"></img>
-<img src="../../docs/images/carbon.png" width="490"></img>
+<!-- HTML view (Markdown/preview) -->
+<img src="../images/Marque.png" alt="Capture interface marques" width="60%" style="display:block; margin: 0 auto;" />
+
+```{=latex}
+\begin{center}
+\includegraphics[width=0.60\textwidth]{../images/Marque.png}
+\end{center}
+```
+
+<img src="../images/carbon.png" alt="Extrait de code" width="45%" style="display:block; margin: 0 auto;" />
+
+```{=latex}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{../images/carbon.png}
+\end{center}
+```
 
 ---
 
@@ -386,22 +391,18 @@ Plot-those-line/
 
 | Fonctionnalité | Statut | Commit | Issue |
 |----------------|--------|--------|-------|
-| **Service Twelve Data API** | ✅ Terminé | `TwelveDataService.cs` | - |
-| **Interface graphique** | ✅ Terminé | `Form1.cs` | - |
-| **Gestion multi-granularité** | ✅ Terminé | Enum `DataGranularity` | - |
-| **Filtrage par dates** | ✅ Terminé | Période 2020-2025 | - |
-| **Parsing JSON robuste** | ✅ Terminé | Gestion erreurs | - |
-| **Documentation automatisée** | ✅ Terminé | Scripts Python/Batch | - |
+| **Service Twelve Data API** | Terminé | `TwelveDataService.cs` | - |
+| **Interface graphique** | Terminé | `Form1.cs` | - |
+| **Gestion multi-granularité** | Terminé | Enum `DataGranularity` | - |
+| **Filtrage par dates** | Terminé | Période 2020-2025 | - |
+| **Parsing JSON robuste** | Terminé | Gestion erreurs | - |
+| **Documentation automatisée** | Terminé | Scripts Python/Batch | - |
 
 ---
 
 # 5. Tests
 
 ## 5.1 Dossier des tests  
-
-### Version de l'application testée : 1.0.0
-### Date du test : 8 Octobre 2025
-### Nom du testeur : Ryan De Pina
 
 ### Scénario 1
 
@@ -554,4 +555,4 @@ J'ai particulièrement apprécié la réalisation de ce rapport car cela m'a per
 # 8. Divers
 
 ## 8.1 Journal de travail  
-- **Suivi :** Journal de travail détaillé → [📋 Consulter le JDT](../jdt.md)
+- **Suivi :** Journal de travail détaillé → [Consulter le JDT](../jdt.md)
