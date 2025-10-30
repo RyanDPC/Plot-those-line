@@ -1,33 +1,37 @@
 % Header configuration for Pandoc → PDF (LaTeX)
-% Uses fancyhdr to place a banner image in the header on all pages
+% Logo à droite (sauf page de garde où il est centré), pas de titre centré, numéro page en footer
+
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
 \usepackage{geometry}
 
-% Adjust page geometry as needed by your school
-% Example: 2.5cm margins; tweak if necessary
+% Marges
 \geometry{margin=2.5cm}
-
-% Increase headheight to fit the image header
 \setlength{\headheight}{48pt}
 
-% Fancy header/footer setup
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
+% Style "normal" : header avec logo à droite, trait, footer numéro de page centré
+\fancypagestyle{normal}{%
+  \fancyhf{}
+  \fancyhead[R]{\includegraphics[height=1.5cm]{C:/Users/pa70iyc/Documents/GitHub/Plot-those-line/docs/images/header.png}}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyfoot[C]{\thepage{} / \pageref{LastPage}}
+}
 
-% Left header: banner image. Path is relative to repository root when running pandoc there.
-% Adjust height to fit your constraints (e.g., 1.2cm–2cm)
-\fancyhead[L]{\includegraphics[height=1.5cm]{script/docs/image.png}}
-
-% Footer: page X / Y (optional — remove if not required)
-\fancyfoot[C]{\thepage{} / \pageref{LastPage}}
-
-% Ensure chapter/section starting pages also use the same header/footer (plain style override)
+% Style page de garde (page 1) : header totalement vide, ni logo ni trait ni numéro
 \fancypagestyle{plain}{%
   \fancyhf{}
   \renewcommand{\headrulewidth}{0pt}
-  \fancyhead[L]{\includegraphics[height=1.5cm]{script/docs/image.png}}
-  \fancyfoot[C]{\thepage{} / \pageref{LastPage}}
+  % rien dans l'en-tête ni le pied
 }
+
+% Pour forcer la table des matières sur une page après la page de garde,
+% insère dans le markdown juste avant le ToC :
+% \newpage
+% \thispagestyle{normal}
+% \tableofcontents
+% \newpage
+% Ainsi, la ToC est sur une page dédiée, avec header normal (logo à droite)
+
+% Appliquer normal à tout le rapport sauf la page de garde (Pandoc = plain)
+\pagestyle{normal}

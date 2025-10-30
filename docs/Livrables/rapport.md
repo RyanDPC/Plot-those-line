@@ -5,72 +5,68 @@ date: "Lausanne, Vennes – 32p "
 project_manager: "Melly Jonathan"
 ---
 
-<div style="color: #ffffff; text-align: center; padding: 30px; font-family: Arial, sans-serif;">
-<div style="color: #ffffff; padding: 20px; margin: 20px; border-radius: 8px;">
-</div>
-<div>
-<h2 style="font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 1px; color: #ffffff;">
-RAPPORT DE PROJET
+<!-- PAGE DE GARDE -->
 
-Plot-Those-Line
-</h2>
-</div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0;">
-<div style="font-size: 16px; font-weight: bold; color: #ffffff; letter-spacing: 3px; font-family: ETML, sans-serif; margin: 0;">
+# Rapport de Projet
+
+De Pina Correia Ryan -- CID3A  
+Lausanne, Vennes -- 32p  
+
+RAPPORT DE PROJET  
+Plot-Those-Line  
 ETML
-</div>
-<div style="font-size: 16px; color: #ffffff; font-style: italic; font-family: cursive;">
-<img src="../../docs/images/header.png" alt="Logo ETML" style="height: 40px; margin: 0 20px;">
-</div>
-</div>
-<div style="width: 100%; height: 2px; margin-top: -20px; background-color: #ffffff;"></div>
 
+\newpage
+
+<!--
 # Table des matières
-- [1. Spécifications](#1-spécifications)
-  - [1.1 Introduction](#11-introduction)
-    - [1.1.1 Description du domaine](#111-description-du-domaine)
-    - [1.1.2 Description du projet](#112-description-du-projet)
-    - [1.1.3 Objectifs pédagogiques](#113-objectifs-pédagogiques)
-  - [1.3 Matériel et logiciels à disposition](#13-matériel-et-logiciels-à-disposition)
-  - [1.4 Prérequis](#14-prérequis)
-  - [1.5 Cahier des charges](#15-cahier-des-charges)
-    - [1.5.1 Objectifs et portée (SMART)](#151-objectifs-et-portée-smart)
-    - [1.5.2 Caractéristiques des utilisateurs et impacts](#152-caractéristiques-des-utilisateurs-et-impacts)
-    - [1.5.3 Fonctionnalités requises](#153-fonctionnalités-requises)
-    - [1.5.4 Contraintes](#154-contraintes)
-    - [1.5.5 Travail à réaliser par l'apprenti](#155-travail-à-réaliser-par-lapprenti)
-    - [1.5.6 Si le temps le permet](#156-si-le-temps-le-permet)
-    - [1.5.7 Méthodes de validation](#157-méthodes-de-validation)
-  - [1.6 Points évalués](#16-points-évalués)
-  - [1.7 Validation et conditions de réussite](#17-validation-et-conditions-de-réussite)
-- [2. Planification Initiale](#2-planification-initiale)
-  - [2.1 Méthodologie de projet](#21-méthodologie-de-projet)
-  - [2.4 Suivi et contrôle](#24-suivi-et-contrôle)
-- [3. Analyse](#3-analyse)
-  - [3.1 Explication API](#31-explication-api)
-  - [3.2 Gestion de l'API](#32-gestion-de-lapi)
-  - [3.3 Conception des tests](#33-conception-des-tests)
-  - [3.4 Affichage graphique (Code)](#34-affichage-graphique-code)
-- [4. Réalisation](#4-réalisation)
-  - [4.1 Dossier de réalisation](#41-dossier-de-réalisation)
-    - [4.1.1 Architecture du projet](#411-architecture-du-projet)
-    - [4.1.2 Fonctionnalités implémentées](#412-fonctionnalités-implémentées)
-  - [4.2 Modifications](#42-modifications)
-- [5. Tests](#5-tests)
-  - [5.1 Dossier des tests](#51-dossier-des-tests)
-- [6. Usage de l'IA](#6-usage-de-lia)
-  - [6.1 Rapport et documentation](#61-rapport-et-documentation)
-  - [6.2 Développement du code](#62-développement-du-code)
-  - [6.3 Interface utilisateur (CSS)](#63-interface-utilisateur-css)
-- [7. Conclusion](#7-conclusion)
-  - [7.1 Bilan des fonctionnalités demandées](#71-bilan-des-fonctionnalités-demandées)
-  - [7.2 Bilan de la planification](#72-bilan-de-la-planification)
-  - [7.3 Bilan personnel](#73-bilan-personnel)
-- [8. Divers](#8-divers)
-  - [8.1 Journal de travail](#81-journal-de-travail)
 
----
+- [1. Spécifications](#1-spécifications)
+    - [1.1 Introduction](#11-introduction)
+        - [1.1.1 Description du domaine](#111-description-du-domaine)
+        - [1.1.2 Description du projet](#112-description-du-projet)
+        - [1.1.3 Objectifs pédagogiques](#113-objectifs-pédagogiques)
+    - [1.3 Matériel et logiciels à disposition](#13-matériel-et-logiciels-à-disposition)
+    - [1.4 Prérequis](#14-prérequis)
+    - [1.5 Cahier des charges](#15-cahier-des-charges)
+        - [1.5.1 Objectifs et portée (SMART)](#151-objectifs-et-portée-smart)
+        - [1.5.2 Caractéristiques des utilisateurs et impacts](#152-caractéristiques-des-utilisateurs-et-impacts)
+        - [1.5.3 Fonctionnalités requises](#153-fonctionnalités-requises)
+        - [1.5.4 Contraintes](#154-contraintes)
+        - [1.5.5 Travail à réaliser par l'apprenti](#155-travail-à-réaliser-par-lapprenti)
+        - [1.5.6 Si le temps le permet](#156-si-le-temps-le-permet)
+        - [1.5.7 Méthodes de validation](#157-méthodes-de-validation)
+    - [1.6 Points évalués](#16-points-évalués)
+    - [1.7 Validation et conditions de réussite](#17-validation-et-conditions-de-réussite)
+- [2. Planification Initiale](#2-planification-initiale)
+    - [2.1 Méthodologie de projet](#21-méthodologie-de-projet)
+    - [2.4 Suivi et contrôle](#24-suivi-et-contrôle)
+- [3. Analyse](#3-analyse)
+    - [3.1 Explication API](#31-explication-api)
+    - [3.2 Gestion de l'API](#32-gestion-de-lapi)
+    - [3.3 Conception des tests](#33-conception-des-tests)
+    - [3.4 Affichage graphique (Code)](#34-affichage-graphique-code)
+- [4. Réalisation](#4-réalisation)
+    - [4.1 Dossier de réalisation](#41-dossier-de-réalisation)
+        - [4.1.1 Architecture du projet](#411-architecture-du-projet)
+        - [4.1.2 Fonctionnalités implémentées](#412-fonctionnalités-implémentées)
+    - [4.2 Modifications](#42-modifications)
+- [5. Tests](#5-tests)
+    - [5.1 Dossier des tests](#51-dossier-des-tests)
+- [6. Usage de l'IA](#6-usage-de-lia)
+    - [6.1 Rapport et documentation](#61-rapport-et-documentation)
+    - [6.2 Développement du code](#62-développement-du-code)
+    - [6.3 Interface utilisateur (CSS)](#63-interface-utilisateur-css)
+- [7. Conclusion](#7-conclusion)
+    - [7.1 Bilan des fonctionnalités demandées](#71-bilan-des-fonctionnalités-demandées)
+    - [7.2 Bilan de la planification](#72-bilan-de-la-planification)
+    - [7.3 Bilan personnel](#73-bilan-personnel)
+- [8. Divers](#8-divers)
+    - [8.1 Journal de travail](#81-journal-de-travail)
+-->
+
+\tableofcontents
+\newpage
 
 <h1 style="color: #ffffff; padding: 10px 0; margin: 20px 0;">1. Spécifications</h1>
 
@@ -398,6 +394,7 @@ Plot-those-line/
 | **Documentation automatisée** | ✅ Terminé | Scripts Python/Batch | - |
 
 ---
+
 # 5. Tests
 
 ## 5.1 Dossier des tests  
@@ -514,6 +511,7 @@ Assurer une mise à jour continue des données boursières de plusieurs entrepri
 **Résultat attendu** : Si l'entreprise est sur l'API, les séries temporelles sont visibles dans l'application avec les bonnes valeurs.
 
 ---
+
 # 6. Usage de l'IA
 
 Dans ce projet, j'ai utilisé l'intelligence artificielle de manière ciblée pour m'assister dans différents aspects du développement. Voici un récapitulatif détaillé de mon utilisation :
@@ -557,4 +555,3 @@ J'ai particulièrement apprécié la réalisation de ce rapport car cela m'a per
 
 ## 8.1 Journal de travail  
 - **Suivi :** Journal de travail détaillé → [📋 Consulter le JDT](../jdt.md)
-</div>
